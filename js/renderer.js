@@ -1,0 +1,209 @@
+export class Renderer {
+
+constructor(canvas) {
+    this.canvas = canvas;
+    this.gl = canvas.getContext("webgl");
+
+    if (!this.gl) {
+        throw new Error("WebGL is not supported by this browser.");
+    }
+
+    console.log("WebGL initialized successfully!");
+
+    this.shaderProgram = this.createShaderProgram();
+    this.vertexBuffer = this.gl.createBuffer();
+
+    this.positionLocation = this.gl.getAttribLocation(
+        this.shaderProgram,
+        "aPosition"
+    );
+
+    this.colorLocation = this.gl.getUniformLocation(
+        this.shaderProgram,
+        "uColor"
+    );
+}
+
+    clear() {
+        const gl = this.gl;
+
+        gl.clearColor(0.9, 0.9, 0.9, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+
+    //#region Shader
+    createShaderProgram() {
+        const gl = this.gl;
+
+        const vertexShaderSource = `
+            attribute vec2 aPosition;
+
+            void main() {
+                gl_Position = vec4(aPosition, 0.0, 1.0);
+            }
+        `;
+
+        const fragmentShaderSource = `
+            precision mediump float;
+
+            uniform vec4 uColor;
+
+            void main() {
+                gl_FragColor = uColor;
+            }        
+        `;
+
+        const vertexShader = this.compileShader(gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+        const shaderProgram = gl.createProgram();
+
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            throw new Error(
+                "Could not link shader program: " +
+                gl.getProgramInfoLog(shaderProgram)
+            );
+        }
+
+        return shaderProgram;
+    }
+
+
+    setColor(r, g, b, a = 1.0) {
+        this.gl.uniform4f(this.colorLocation, r, g, b, a);
+    }
+
+    //#endregion
+
+    compileShader(type, source) {
+        const gl = this.gl;
+
+        const shader = gl.createShader(type);
+
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            throw new Error(
+                "Shader compilation failed: " +
+                gl.getShaderInfoLog(shader)
+            );
+        }
+
+        return shader;
+    }
+
+    prepareBuffer(vertices) {
+        const gl = this.gl;
+
+        const vertexData = new Float32Array(vertices);
+
+        gl.useProgram(this.shaderProgram);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.DYNAMIC_DRAW);
+
+        gl.enableVertexAttribArray(this.positionLocation);
+
+        gl.vertexAttribPointer(
+            this.positionLocation,
+            2,
+            gl.FLOAT,
+            false,
+            0,
+            0
+        );
+    }
+
+    drawGrid(grid) {
+        const gl = this.gl;
+        const vertices = [];
+
+        const cellWidth = 2 / grid.width;
+        const cellHeight = 2 / grid.height;
+
+        for (let y = 0; y < grid.height; y++) {
+            for (let x = 0; x < grid.width; x++) {
+
+                if (grid.getCell(x, y) === 0) {
+                    continue;
+                }
+
+                const left = -1 + x * cellWidth;
+                const right = left + cellWidth;
+
+                const top = 1 - y * cellHeight;
+                const bottom = top - cellHeight;
+
+                vertices.push(
+                    left, top,
+                    left, bottom,
+                    right, top,
+
+                    right, top,
+                    left, bottom,
+                    right, bottom
+                );
+            }
+        }
+
+        this.setColor(0.15, 0.15, 0.15);
+        this.prepareBuffer(vertices);
+
+        gl.drawArrays(
+            gl.TRIANGLES,
+            0,
+            vertices.length / 2
+        );
+    }
+
+    drawSegments(segments, grid) {
+        const gl = this.gl;
+        const vertices = [];
+
+        for (const segment of segments) {
+
+            const x1 = -1 + (segment.start.x / (grid.width - 1)) * 2;
+            const y1 = 1 - (segment.start.y / (grid.height - 1)) * 2;
+
+            const x2 = -1 + (segment.end.x / (grid.width - 1)) * 2;
+            const y2 = 1 - (segment.end.y / (grid.height - 1)) * 2;
+
+            vertices.push(x1, y1, x2, y2);
+        }
+
+        this.setColor(0.8, 0.1, 0.1);
+        this.prepareBuffer(vertices);
+
+        gl.drawArrays(
+            gl.LINES,
+            0,
+            vertices.length / 2
+        );
+    }
+
+    drawMarchingTriangles(triangles, grid) {
+        const gl = this.gl;
+        const vertices = [];
+
+        for (const point of triangles) {
+            const x = -1 + (point.x / (grid.width - 1)) * 2;
+            const y = 1 - (point.y / (grid.height - 1)) * 2;
+
+            vertices.push(x, y);
+        }
+
+        this.setColor(0.2, 0.4, 0.7);
+        this.prepareBuffer(vertices);
+
+        gl.drawArrays(
+            gl.TRIANGLES,
+            0,
+            vertices.length / 2
+        );
+    }
+}
