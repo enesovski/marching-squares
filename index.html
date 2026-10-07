@@ -3,70 +3,52 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>CS465 Assignment 1</title>
 
-    <title>
-        CS465 Assignment 1
-    </title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
 
-    <h1>
-        CS465 - Assignment 1
-    </h1>
+    <h1>CS465 - Assignment 1</h1>
 
-    <button id="toggleView">
-        Switch to Marching Squares
-    </button>
+    <button id="toggleView">Switch to Marching Squares</button>
 
-    <button id="toggleMarchingMode">
-        Marching Mode: Lines
-    </button>
+    <button id="toggleMarchingMode">Marching Mode: Lines</button>
 
     <label for="brushType">Brush:</label>
-
     <select id="brushType">
         <option value="circle">Circle</option>
         <option value="square">Square</option>
     </select>
 
     <label for="brushSize">Brush Size:</label>
+    <input
+        id="brushSize"
+        type="range"
+        min="1"
+        max="9"
+        step="2"
+        value="1">
+    <span id="brushSizeValue">1</span>
 
     <label for="gridResolution">Grid:</label>
-
     <select id="gridResolution">
         <option value="20">20 x 20</option>
         <option value="40" selected>40 x 40</option>
         <option value="80">80 x 80</option>
     </select>
-    <input
-    id="brushSize"
-    type="range"
-    min="1"
-    max="9"
-    step="2"
-    value="1">
 
-    
-    <span id="brushSizeValue">1</span>
 
-    <button id="clearButton">
-        Clear
-    </button>
-    
-    <br>
-    <br>
+    <button id="undoButton" disabled>Undo</button>
+    <button id="redoButton" disabled>Redo</button>
+    <button id="clearButton">Clear</button>
 
-    <canvas
-        id="glCanvas"
-        width="800"
-        height="800">
-    </canvas>
+    <br><br>
 
-    <script
-        type="module"
-        src="./js/main.js">
-    </script>
+    <canvas id="glCanvas" width="800" height="800"></canvas>
+
+    <script type="module" src="./js/main.js"></script>
 
 </body>
 

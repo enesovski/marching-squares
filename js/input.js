@@ -1,22 +1,46 @@
+import { StrokeAction } from "./actions/strokeAction.js";
+
 export class Input {
 
-    constructor(canvas, grid, onChange) {
+    constructor(canvas, grid, onChange, onActionCompleted) {
         this.canvas = canvas;
         this.grid = grid;
+
         this.onChange = onChange;
+        this.onActionCompleted = onActionCompleted;
 
         this.brushType = "circle";
         this.brushSize = 1;
 
+        this.currentStroke = null;
+
         canvas.addEventListener("mousedown", (event) => {
-            this.handleMouse(event);
+            if (event.button !== 0) {
+                return;
+            }
+
+            this.startStroke(event);
         });
 
         canvas.addEventListener("mousemove", (event) => {
-            if (event.buttons === 1) {
-                this.handleMouse(event);
+            if (!this.currentStroke) {
+                return;
             }
+
+            this.continueStroke(event);
         });
+
+        window.addEventListener("mouseup", (event) => {
+            if (event.button !== 0) {
+                return;
+            }
+
+            this.endStroke();
+        });
+    }
+
+    setGrid(grid) {
+        this.grid = grid;
     }
 
     setBrushType(type) {
@@ -27,11 +51,49 @@ export class Input {
         this.brushSize = size;
     }
 
-    setGrid(grid) {
-        this.grid = grid;
+    startStroke(event) {
+        this.currentStroke = new StrokeAction(this.brushType, this.brushSize);
+        this.addStrokePoint(event);
     }
 
-    handleMouse(event) {
+    continueStroke(event) {
+        this.addStrokePoint(event);
+    }
+
+    endStroke() {
+        if (!this.currentStroke) {
+            return;
+        }
+
+        if (this.currentStroke.points.length > 0) {
+            this.onActionCompleted(this.currentStroke);
+        }
+
+        this.currentStroke = null;
+    }
+
+    cancelStroke() {
+        this.currentStroke = null;
+    }
+
+    addStrokePoint(event) {
+        const point = this.getGridPosition(event);
+
+        if (!this.grid.isInside(point.x, point.y)) {
+            return;
+        }
+
+        const addedPoint = this.currentStroke.addPoint(point.x, point.y);
+
+        if (!addedPoint) {
+            return;
+        }
+
+        this.currentStroke.applyPoint(this.grid, addedPoint);
+        this.onChange();
+    }
+
+    getGridPosition(event) {
         const rect = this.canvas.getBoundingClientRect();
 
         const mouseX = event.clientX - rect.left;
@@ -40,44 +102,9 @@ export class Input {
         const cellWidth = rect.width / this.grid.width;
         const cellHeight = rect.height / this.grid.height;
 
-        const gridX = Math.floor(mouseX / cellWidth);
-        const gridY = Math.floor(mouseY / cellHeight);
-
-        this.applyBrush(gridX, gridY);
-
-        this.onChange();
-    }
-
-    applyBrush(centerX, centerY) {
-        if (this.brushType === "circle") {
-            this.applyCircleBrush(centerX, centerY);
-        } else {
-            this.applySquareBrush(centerX, centerY);
-        }
-    }
-
-    applyCircleBrush(centerX, centerY) {
-        const radius = Math.floor(this.brushSize / 2);
-
-        for (let y = centerY - radius; y <= centerY + radius; y++) {
-            for (let x = centerX - radius; x <= centerX + radius; x++) {
-                const dx = x - centerX;
-                const dy = y - centerY;
-
-                if (dx * dx + dy * dy <= radius * radius) {
-                    this.grid.setCell(x, y, 1);
-                }
-            }
-        }
-    }
-
-    applySquareBrush(centerX, centerY) {
-        const radius = Math.floor(this.brushSize / 2);
-
-        for (let y = centerY - radius; y <= centerY + radius; y++) {
-            for (let x = centerX - radius; x <= centerX + radius; x++) {
-                this.grid.setCell(x, y, 1);
-            }
-        }
+        return {
+            x: Math.floor(mouseX / cellWidth),
+            y: Math.floor(mouseY / cellHeight)
+        };
     }
 }

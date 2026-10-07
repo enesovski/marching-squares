@@ -3,25 +3,31 @@ import { Grid } from "./grid.js";
 import { Input } from "./input.js";
 import { MarchingSquares } from "./marchingsquares.js";
 
+import { ClearAction } from "./actions/clearAction.js";
+import { ActionHistory } from "./actions/actionHistory.js";
+
 const canvas = document.getElementById("glCanvas");
 
 const toggleViewButton = document.getElementById("toggleView");
-const toggleMarchingButton = document.getElementById("toggleMarchingMode");
+const toggleMarchingModeButton = document.getElementById("toggleMarchingMode");
 
 const brushTypeSelect = document.getElementById("brushType");
 const brushSizeSlider = document.getElementById("brushSize");
 const brushSizeValue = document.getElementById("brushSizeValue");
 const gridResolutionSelect = document.getElementById("gridResolution");
 
+const undoButton = document.getElementById("undoButton");
+const redoButton = document.getElementById("redoButton");
 const clearButton = document.getElementById("clearButton");
 
 const renderer = new Renderer(canvas);
-let grid = new Grid(40, 40);
 const marchingSquares = new MarchingSquares();
+const history = new ActionHistory();
+
+let grid = new Grid(40, 40);
 
 let viewMode = "grid";
 let marchingMode = "lines";
-
 
 function render() {
     renderer.clear();
@@ -34,11 +40,27 @@ function render() {
     if (marchingMode === "lines") {
         const segments = marchingSquares.generateSegments(grid);
         renderer.drawSegments(segments, grid);
-    } else {
-        const triangles = marchingSquares.generateTriangles(grid);
-        renderer.drawMarchingTriangles(triangles, grid);
+        return;
     }
+
+    const triangles = marchingSquares.generateTriangles(grid);
+    renderer.drawMarchingTriangles(triangles, grid);
 }
+
+function updateHistoryButtons() {
+    undoButton.disabled = !history.canUndo();
+    redoButton.disabled = !history.canRedo();
+}
+
+function onActionCompleted(action) {
+    history.commit(action);
+    updateHistoryButtons();
+}
+
+const input = new Input(canvas, grid, render, onActionCompleted);
+
+input.setBrushType(brushTypeSelect.value);
+input.setBrushSize(Number(brushSizeSlider.value));
 
 toggleViewButton.addEventListener("click", () => {
     if (viewMode === "grid") {
@@ -52,33 +74,17 @@ toggleViewButton.addEventListener("click", () => {
     render();
 });
 
-clearButton.addEventListener("click", () => {
-    grid.clear();
-    render();
-});
-
-toggleMarchingButton.addEventListener("click", () => {
+toggleMarchingModeButton.addEventListener("click", () => {
     if (marchingMode === "lines") {
         marchingMode = "filled";
-        toggleMarchingButton.textContent = "Marching Mode: Filled";
+        toggleMarchingModeButton.textContent = "Marching Mode: Filled";
     } else {
         marchingMode = "lines";
-        toggleMarchingButton.textContent = "Marching Mode: Lines";
+        toggleMarchingModeButton.textContent = "Marching Mode: Lines";
     }
 
     render();
 });
-
-gridResolutionSelect.addEventListener("change", () => {
-    const size = Number(gridResolutionSelect.value);
-
-    grid = new Grid(size, size);
-    input.setGrid(grid);
-
-    render();
-});
-
-const input = new Input(canvas, grid, render);
 
 brushTypeSelect.addEventListener("change", () => {
     input.setBrushType(brushTypeSelect.value);
@@ -91,4 +97,44 @@ brushSizeSlider.addEventListener("input", () => {
     brushSizeValue.textContent = size;
 });
 
+gridResolutionSelect.addEventListener("change", () => {
+    const size = Number(gridResolutionSelect.value);
+
+    input.cancelStroke();
+
+    grid = new Grid(size, size);
+    input.setGrid(grid);
+
+    history.reset();
+    updateHistoryButtons();
+
+    render();
+});
+
+clearButton.addEventListener("click", () => {
+    history.execute(new ClearAction(), grid);
+
+    updateHistoryButtons();
+    render();
+});
+
+undoButton.addEventListener("click", () => {
+    if (!history.undo(grid)) {
+        return;
+    }
+
+    updateHistoryButtons();
+    render();
+});
+
+redoButton.addEventListener("click", () => {
+    if (!history.redo(grid)) {
+        return;
+    }
+
+    updateHistoryButtons();
+    render();
+});
+
+updateHistoryButtons();
 render();
