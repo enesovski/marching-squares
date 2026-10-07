@@ -3,22 +3,57 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>CS465 Assignment 1</title>
+
+    <title>
+        CS465 Assignment 1
+    </title>
 </head>
 
 <body>
 
-    <h1>CS465 - Assignment 1</h1>
+    <h1>
+        CS465 - Assignment 1
+    </h1>
 
-    <button id="toggleView">Switch to Marching Squares</button>
+    <button id="toggleView">
+        Switch to Marching Squares
+    </button>
 
-    <button id="toggleMarchingMode">Marching Mode: Lines</button>
+    <button id="toggleMarchingMode">
+        Marching Mode: Lines
+    </button>
 
-    <br><br>
+    <label for="brushType">Brush:</label>
 
-    <canvas id="glCanvas" width="800" height="600"></canvas>
-    
-    <script type="module" src="./js/main.js"></script>
+    <select id="brushType">
+        <option value="circle">Circle</option>
+        <option value="square">Square</option>
+    </select>
+
+    <label for="brushSize">Brush Size:</label>
+
+    <input
+        id="brushSize"
+        type="range"
+        min="1"
+        max="6"
+        value="1">
+
+    <span id="brushSizeValue">1</span>
+
+    <br>
+    <br>
+
+    <canvas
+        id="glCanvas"
+        width="800"
+        height="800">
+    </canvas>
+
+    <script
+        type="module"
+        src="./js/main.js">
+    </script>
 
 </body>
 

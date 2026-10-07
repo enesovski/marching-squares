@@ -1,28 +1,21 @@
 export class Renderer {
 
-constructor(canvas) {
-    this.canvas = canvas;
-    this.gl = canvas.getContext("webgl");
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.gl = canvas.getContext("webgl");
 
-    if (!this.gl) {
-        throw new Error("WebGL is not supported by this browser.");
+        if (!this.gl) {
+            throw new Error("WebGL is not supported by this browser.");
+        }
+
+        this.shaderProgram = this.createShaderProgram();
+        this.vertexBuffer = this.gl.createBuffer();
+
+        this.positionLocation = this.gl.getAttribLocation(this.shaderProgram, "aPosition");
+        this.colorLocation = this.gl.getUniformLocation(this.shaderProgram, "uColor");
+
+        this.gl.useProgram(this.shaderProgram);
     }
-
-    console.log("WebGL initialized successfully!");
-
-    this.shaderProgram = this.createShaderProgram();
-    this.vertexBuffer = this.gl.createBuffer();
-
-    this.positionLocation = this.gl.getAttribLocation(
-        this.shaderProgram,
-        "aPosition"
-    );
-
-    this.colorLocation = this.gl.getUniformLocation(
-        this.shaderProgram,
-        "uColor"
-    );
-}
 
     clear() {
         const gl = this.gl;
@@ -31,7 +24,13 @@ constructor(canvas) {
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
-    //#region Shader
+    gridPointToClipSpace(point, grid) {
+        const x = -1 + ((point.x + 0.5) / grid.width) * 2;
+        const y = 1 - ((point.y + 0.5) / grid.height) * 2;
+
+        return { x, y };
+    }
+
     createShaderProgram() {
         const gl = this.gl;
 
@@ -50,7 +49,7 @@ constructor(canvas) {
 
             void main() {
                 gl_FragColor = uColor;
-            }        
+            }
         `;
 
         const vertexShader = this.compileShader(gl.VERTEX_SHADER, vertexShaderSource);
@@ -60,47 +59,38 @@ constructor(canvas) {
 
         gl.attachShader(shaderProgram, vertexShader);
         gl.attachShader(shaderProgram, fragmentShader);
-
         gl.linkProgram(shaderProgram);
 
         if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-            throw new Error(
-                "Could not link shader program: " +
-                gl.getProgramInfoLog(shaderProgram)
-            );
+            throw new Error("Could not link shader program: " + gl.getProgramInfoLog(shaderProgram));
         }
 
         return shaderProgram;
     }
 
-
-    setColor(r, g, b, a = 1.0) {
-        this.gl.uniform4f(this.colorLocation, r, g, b, a);
-    }
-
-    //#endregion
-
     compileShader(type, source) {
         const gl = this.gl;
-
         const shader = gl.createShader(type);
 
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
 
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            throw new Error(
-                "Shader compilation failed: " +
-                gl.getShaderInfoLog(shader)
-            );
+            throw new Error("Shader compilation failed: " + gl.getShaderInfoLog(shader));
         }
 
         return shader;
     }
 
-    prepareBuffer(vertices) {
+    setColor(r, g, b, a = 1.0) {
         const gl = this.gl;
 
+        gl.useProgram(this.shaderProgram);
+        gl.uniform4f(this.colorLocation, r, g, b, a);
+    }
+
+    prepareBuffer(vertices) {
+        const gl = this.gl;
         const vertexData = new Float32Array(vertices);
 
         gl.useProgram(this.shaderProgram);
@@ -108,15 +98,7 @@ constructor(canvas) {
         gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.DYNAMIC_DRAW);
 
         gl.enableVertexAttribArray(this.positionLocation);
-
-        gl.vertexAttribPointer(
-            this.positionLocation,
-            2,
-            gl.FLOAT,
-            false,
-            0,
-            0
-        );
+        gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, 0, 0);
     }
 
     drawGrid(grid) {
@@ -128,14 +110,12 @@ constructor(canvas) {
 
         for (let y = 0; y < grid.height; y++) {
             for (let x = 0; x < grid.width; x++) {
-
                 if (grid.getCell(x, y) === 0) {
                     continue;
                 }
 
                 const left = -1 + x * cellWidth;
                 const right = left + cellWidth;
-
                 const top = 1 - y * cellHeight;
                 const bottom = top - cellHeight;
 
@@ -154,11 +134,37 @@ constructor(canvas) {
         this.setColor(0.15, 0.15, 0.15);
         this.prepareBuffer(vertices);
 
-        gl.drawArrays(
-            gl.TRIANGLES,
-            0,
-            vertices.length / 2
-        );
+        gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 2);
+
+        this.drawGridLines(grid);
+    }
+
+    drawGridLines(grid) {
+        const gl = this.gl;
+        const vertices = [];
+
+        for (let x = 0; x <= grid.width; x++) {
+            const clipX = -1 + (x / grid.width) * 2;
+
+            vertices.push(
+                clipX, 1,
+                clipX, -1
+            );
+        }
+
+        for (let y = 0; y <= grid.height; y++) {
+            const clipY = 1 - (y / grid.height) * 2;
+
+            vertices.push(
+                -1, clipY,
+                1, clipY
+            );
+        }
+
+        this.setColor(0.65, 0.65, 0.65);
+        this.prepareBuffer(vertices);
+
+        gl.drawArrays(gl.LINES, 0, vertices.length / 2);
     }
 
     drawSegments(segments, grid) {
@@ -166,24 +172,19 @@ constructor(canvas) {
         const vertices = [];
 
         for (const segment of segments) {
+            const start = this.gridPointToClipSpace(segment.start, grid);
+            const end = this.gridPointToClipSpace(segment.end, grid);
 
-            const x1 = -1 + (segment.start.x / (grid.width - 1)) * 2;
-            const y1 = 1 - (segment.start.y / (grid.height - 1)) * 2;
-
-            const x2 = -1 + (segment.end.x / (grid.width - 1)) * 2;
-            const y2 = 1 - (segment.end.y / (grid.height - 1)) * 2;
-
-            vertices.push(x1, y1, x2, y2);
+            vertices.push(
+                start.x, start.y,
+                end.x, end.y
+            );
         }
 
         this.setColor(0.8, 0.1, 0.1);
         this.prepareBuffer(vertices);
 
-        gl.drawArrays(
-            gl.LINES,
-            0,
-            vertices.length / 2
-        );
+        gl.drawArrays(gl.LINES, 0, vertices.length / 2);
     }
 
     drawMarchingTriangles(triangles, grid) {
@@ -191,19 +192,14 @@ constructor(canvas) {
         const vertices = [];
 
         for (const point of triangles) {
-            const x = -1 + (point.x / (grid.width - 1)) * 2;
-            const y = 1 - (point.y / (grid.height - 1)) * 2;
+            const position = this.gridPointToClipSpace(point, grid);
 
-            vertices.push(x, y);
+            vertices.push(position.x, position.y);
         }
 
         this.setColor(0.2, 0.4, 0.7);
         this.prepareBuffer(vertices);
 
-        gl.drawArrays(
-            gl.TRIANGLES,
-            0,
-            vertices.length / 2
-        );
+        gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 2);
     }
 }

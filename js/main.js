@@ -4,8 +4,13 @@ import { Input } from "./input.js";
 import { MarchingSquares } from "./marchingsquares.js";
 
 const canvas = document.getElementById("glCanvas");
+
 const toggleViewButton = document.getElementById("toggleView");
 const toggleMarchingButton = document.getElementById("toggleMarchingMode");
+
+const brushTypeSelect = document.getElementById("brushType");
+const brushSizeSlider = document.getElementById("brushSize");
+const brushSizeValue = document.getElementById("brushSizeValue");
 
 const renderer = new Renderer(canvas);
 const grid = new Grid(20, 20);
@@ -56,5 +61,16 @@ toggleMarchingButton.addEventListener("click", () => {
 });
 
 const input = new Input(canvas, grid, render);
+
+brushTypeSelect.addEventListener("change", () => {
+    input.setBrushType(brushTypeSelect.value);
+});
+
+brushSizeSlider.addEventListener("input", () => {
+    const size = Number(brushSizeSlider.value);
+
+    input.setBrushSize(size);
+    brushSizeValue.textContent = size;
+});
 
 render();

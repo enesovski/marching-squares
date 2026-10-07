@@ -3,9 +3,9 @@ export class MarchingSquares {
     generateSegments(grid) {
         const segments = [];
 
-        for (let y = 0; y < grid.height - 1; y++) {
-            for (let x = 0; x < grid.width - 1; x++) {
-
+        // One-cell empty border is assumed outside the grid.
+        for (let y = -1; y < grid.height; y++) {
+            for (let x = -1; x < grid.width; x++) {
                 const A = grid.getCell(x, y);
                 const B = grid.getCell(x + 1, y);
                 const C = grid.getCell(x + 1, y + 1);
@@ -28,9 +28,8 @@ export class MarchingSquares {
     generateTriangles(grid) {
         const triangles = [];
 
-        for (let y = 0; y < grid.height - 1; y++) {
-            for (let x = 0; x < grid.width - 1; x++) {
-
+        for (let y = -1; y < grid.height; y++) {
+            for (let x = -1; x < grid.width; x++) {
                 const AValue = grid.getCell(x, y);
                 const BValue = grid.getCell(x + 1, y);
                 const CValue = grid.getCell(x + 1, y + 1);
@@ -48,18 +47,7 @@ export class MarchingSquares {
                 const bottom = { x: x + 0.5, y: y + 1 };
                 const left = { x: x, y: y + 0.5 };
 
-                this.addCaseTriangles(
-                    caseIndex,
-                    A,
-                    B,
-                    C,
-                    D,
-                    top,
-                    right,
-                    bottom,
-                    left,
-                    triangles
-                );
+                this.addCaseTriangles(caseIndex, A, B, C, D, top, right, bottom, left, triangles);
             }
         }
 
@@ -71,9 +59,7 @@ export class MarchingSquares {
     }
 
     addCaseSegments(caseIndex, top, right, bottom, left, segments) {
-
         switch (caseIndex) {
-
             case 0:
                 break;
 
@@ -93,9 +79,10 @@ export class MarchingSquares {
                 segments.push({ start: top, end: right });
                 break;
 
+            // Ambiguous case: keep diagonal regions separate.
             case 5:
-                segments.push({ start: top, end: left });
-                segments.push({ start: bottom, end: right });
+                segments.push({ start: top, end: right });
+                segments.push({ start: bottom, end: left });
                 break;
 
             case 6:
@@ -114,9 +101,10 @@ export class MarchingSquares {
                 segments.push({ start: top, end: bottom });
                 break;
 
+            // Ambiguous case: keep diagonal regions separate.
             case 10:
-                segments.push({ start: left, end: bottom });
-                segments.push({ start: top, end: right });
+                segments.push({ start: left, end: top });
+                segments.push({ start: right, end: bottom });
                 break;
 
             case 11:
@@ -140,21 +128,8 @@ export class MarchingSquares {
         }
     }
 
-    addCaseTriangles(
-        caseIndex,
-        A,
-        B,
-        C,
-        D,
-        top,
-        right,
-        bottom,
-        left,
-        triangles
-    ) {
-
+    addCaseTriangles(caseIndex, A, B, C, D, top, right, bottom, left, triangles) {
         switch (caseIndex) {
-
             case 0:
                 break;
 
@@ -176,10 +151,8 @@ export class MarchingSquares {
                 break;
 
             case 5:
-                this.addTriangle(triangles, B, right, bottom);
-                this.addTriangle(triangles, B, bottom, D);
-                this.addTriangle(triangles, B, D, left);
-                this.addTriangle(triangles, B, left, top);
+                this.addTriangle(triangles, B, top, right);
+                this.addTriangle(triangles, D, bottom, left);
                 break;
 
             case 6:
@@ -203,10 +176,8 @@ export class MarchingSquares {
                 break;
 
             case 10:
-                this.addTriangle(triangles, A, top, right);
-                this.addTriangle(triangles, A, right, C);
-                this.addTriangle(triangles, A, C, bottom);
-                this.addTriangle(triangles, A, bottom, left);
+                this.addTriangle(triangles, A, left, top);
+                this.addTriangle(triangles, C, right, bottom);
                 break;
 
             case 11:
