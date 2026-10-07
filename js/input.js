@@ -36,35 +36,29 @@ export class Input {
         const cellWidth = rect.width / this.grid.width;
         const cellHeight = rect.height / this.grid.height;
 
-        // Grid coordinates where integer positions represent cell centers.
-        const mouseGridX = mouseX / cellWidth - 0.5;
-        const mouseGridY = mouseY / cellHeight - 0.5;
+        const gridX = Math.floor(mouseX / cellWidth);
+        const gridY = Math.floor(mouseY / cellHeight);
 
-        this.applyBrush(mouseGridX, mouseGridY);
+        this.applyBrush(gridX, gridY);
 
         this.onChange();
     }
 
-    applyBrush(mouseX, mouseY) {
+    applyBrush(centerX, centerY) {
         if (this.brushType === "circle") {
-            this.applyCircleBrush(mouseX, mouseY);
+            this.applyCircleBrush(centerX, centerY);
         } else {
-            this.applySquareBrush(mouseX, mouseY);
+            this.applySquareBrush(centerX, centerY);
         }
     }
 
-    applyCircleBrush(mouseX, mouseY) {
-        const radius = this.brushSize;
+    applyCircleBrush(centerX, centerY) {
+        const radius = Math.floor(this.brushSize / 2);
 
-        const minX = Math.floor(mouseX - radius);
-        const maxX = Math.ceil(mouseX + radius);
-        const minY = Math.floor(mouseY - radius);
-        const maxY = Math.ceil(mouseY + radius);
-
-        for (let y = minY; y <= maxY; y++) {
-            for (let x = minX; x <= maxX; x++) {
-                const dx = x - mouseX;
-                const dy = y - mouseY;
+        for (let y = centerY - radius; y <= centerY + radius; y++) {
+            for (let x = centerX - radius; x <= centerX + radius; x++) {
+                const dx = x - centerX;
+                const dy = y - centerY;
 
                 if (dx * dx + dy * dy <= radius * radius) {
                     this.grid.setCell(x, y, 1);
@@ -73,22 +67,12 @@ export class Input {
         }
     }
 
-    applySquareBrush(mouseX, mouseY) {
-        const radius = this.brushSize;
+    applySquareBrush(centerX, centerY) {
+        const radius = Math.floor(this.brushSize / 2);
 
-        const minX = Math.floor(mouseX - radius);
-        const maxX = Math.ceil(mouseX + radius);
-        const minY = Math.floor(mouseY - radius);
-        const maxY = Math.ceil(mouseY + radius);
-
-        for (let y = minY; y <= maxY; y++) {
-            for (let x = minX; x <= maxX; x++) {
-                const dx = Math.abs(x - mouseX);
-                const dy = Math.abs(y - mouseY);
-
-                if (dx <= radius && dy <= radius) {
-                    this.grid.setCell(x, y, 1);
-                }
+        for (let y = centerY - radius; y <= centerY + radius; y++) {
+            for (let x = centerX - radius; x <= centerX + radius; x++) {
+                this.grid.setCell(x, y, 1);
             }
         }
     }

@@ -13,7 +13,7 @@ const brushSizeSlider = document.getElementById("brushSize");
 const brushSizeValue = document.getElementById("brushSizeValue");
 
 const renderer = new Renderer(canvas);
-const grid = new Grid(20, 20);
+const grid = new Grid(40, 40);
 const marchingSquares = new MarchingSquares();
 
 let viewMode = "grid";
