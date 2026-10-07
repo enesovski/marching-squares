@@ -27,6 +27,10 @@ export class Input {
         this.brushSize = size;
     }
 
+    setGrid(grid) {
+        this.grid = grid;
+    }
+
     handleMouse(event) {
         const rect = this.canvas.getBoundingClientRect();
 

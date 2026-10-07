@@ -26,4 +26,8 @@ export class Grid {
 
         this.cells[y * this.width + x] = value;
     }
+
+    clear() {
+        this.cells.fill(0);
+    }
 }

@@ -11,13 +11,17 @@ const toggleMarchingButton = document.getElementById("toggleMarchingMode");
 const brushTypeSelect = document.getElementById("brushType");
 const brushSizeSlider = document.getElementById("brushSize");
 const brushSizeValue = document.getElementById("brushSizeValue");
+const gridResolutionSelect = document.getElementById("gridResolution");
+
+const clearButton = document.getElementById("clearButton");
 
 const renderer = new Renderer(canvas);
-const grid = new Grid(40, 40);
+let grid = new Grid(40, 40);
 const marchingSquares = new MarchingSquares();
 
 let viewMode = "grid";
 let marchingMode = "lines";
+
 
 function render() {
     renderer.clear();
@@ -48,6 +52,11 @@ toggleViewButton.addEventListener("click", () => {
     render();
 });
 
+clearButton.addEventListener("click", () => {
+    grid.clear();
+    render();
+});
+
 toggleMarchingButton.addEventListener("click", () => {
     if (marchingMode === "lines") {
         marchingMode = "filled";
@@ -56,6 +65,15 @@ toggleMarchingButton.addEventListener("click", () => {
         marchingMode = "lines";
         toggleMarchingButton.textContent = "Marching Mode: Lines";
     }
+
+    render();
+});
+
+gridResolutionSelect.addEventListener("change", () => {
+    const size = Number(gridResolutionSelect.value);
+
+    grid = new Grid(size, size);
+    input.setGrid(grid);
 
     render();
 });

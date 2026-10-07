@@ -32,6 +32,13 @@
 
     <label for="brushSize">Brush Size:</label>
 
+    <label for="gridResolution">Grid:</label>
+
+    <select id="gridResolution">
+        <option value="20">20 x 20</option>
+        <option value="40" selected>40 x 40</option>
+        <option value="80">80 x 80</option>
+    </select>
     <input
     id="brushSize"
     type="range"
@@ -40,8 +47,13 @@
     step="2"
     value="1">
 
+    
     <span id="brushSizeValue">1</span>
 
+    <button id="clearButton">
+        Clear
+    </button>
+    
     <br>
     <br>
 
