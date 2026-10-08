@@ -5,6 +5,7 @@ export class Grid {
         this.height = height;
 
         this.cells = new Array(width * height).fill(0);
+        this.colors = new Array(width * height).fill(null);
     }
 
     isInside(x, y) {

@@ -17,6 +17,10 @@ const brushSizeSlider = document.getElementById("brushSize");
 const brushSizeValue = document.getElementById("brushSizeValue");
 const gridResolutionSelect = document.getElementById("gridResolution");
 
+const backgroundColorInput = document.getElementById("backgroundColor");
+const fillColorInput = document.getElementById("fillColor");
+const boundaryColorInput = document.getElementById("boundaryColor");
+
 const undoButton = document.getElementById("undoButton");
 const redoButton = document.getElementById("redoButton");
 const clearButton = document.getElementById("clearButton");
@@ -28,6 +32,10 @@ const loadFileInput = document.getElementById("loadFileInput");
 const renderer = new Renderer(canvas);
 const marchingSquares = new MarchingSquares();
 const history = new ActionHistory();
+
+renderer.setBackgroundColor(backgroundColorInput.value);
+renderer.setFillColor(fillColorInput.value);
+renderer.setBoundaryColor(boundaryColorInput.value);
 
 let grid = new Grid(40, 40);
 
@@ -100,6 +108,21 @@ brushSizeSlider.addEventListener("input", () => {
 
     input.setBrushSize(size);
     brushSizeValue.textContent = size;
+});
+
+backgroundColorInput.addEventListener("input", () => {
+    renderer.setBackgroundColor(backgroundColorInput.value);
+    render();
+});
+
+fillColorInput.addEventListener("input", () => {
+    renderer.setFillColor(fillColorInput.value);
+    render();
+});
+
+boundaryColorInput.addEventListener("input", () => {
+    renderer.setBoundaryColor(boundaryColorInput.value);
+    render();
 });
 
 gridResolutionSelect.addEventListener("change", () => {

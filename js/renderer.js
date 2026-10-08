@@ -14,13 +14,17 @@ export class Renderer {
         this.positionLocation = this.gl.getAttribLocation(this.shaderProgram, "aPosition");
         this.colorLocation = this.gl.getUniformLocation(this.shaderProgram, "uColor");
 
+        this.backgroundColor = [0.9, 0.9, 0.9];
+        this.fillColor = [0.15, 0.15, 0.15];
+        this.boundaryColor = [0.8, 0.1, 0.1];
+
         this.gl.useProgram(this.shaderProgram);
     }
 
     clear() {
         const gl = this.gl;
 
-        gl.clearColor(0.9, 0.9, 0.9, 1.0);
+        gl.clearColor(...this.backgroundColor, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
@@ -89,6 +93,28 @@ export class Renderer {
         gl.uniform4f(this.colorLocation, r, g, b, a);
     }
 
+    setBackgroundColor(hex) {
+        this.backgroundColor = this.hexToRgb(hex);
+    }
+
+    setFillColor(hex) {
+        this.fillColor = this.hexToRgb(hex);
+    }
+
+    setBoundaryColor(hex) {
+        this.boundaryColor = this.hexToRgb(hex);
+    }
+
+    hexToRgb(hex) {
+        const value = parseInt(hex.substring(1), 16);
+
+        const r = ((value >> 16) & 255) / 255;
+        const g = ((value >> 8) & 255) / 255;
+        const b = (value & 255) / 255;
+
+        return [r, g, b];
+    }
+
     prepareBuffer(vertices) {
         const gl = this.gl;
         const vertexData = new Float32Array(vertices);
@@ -131,7 +157,7 @@ export class Renderer {
             }
         }
 
-        this.setColor(0.15, 0.15, 0.15);
+        this.setColor(...this.fillColor);
         this.prepareBuffer(vertices);
 
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 2);
@@ -181,7 +207,7 @@ export class Renderer {
             );
         }
 
-        this.setColor(0.8, 0.1, 0.1);
+        this.setColor(...this.boundaryColor);
         this.prepareBuffer(vertices);
 
         gl.drawArrays(gl.LINES, 0, vertices.length / 2);
@@ -197,7 +223,7 @@ export class Renderer {
             vertices.push(position.x, position.y);
         }
 
-        this.setColor(0.2, 0.4, 0.7);
+        this.setColor(...this.fillColor);
         this.prepareBuffer(vertices);
 
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 2);
