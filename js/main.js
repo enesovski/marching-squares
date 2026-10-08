@@ -5,6 +5,7 @@ import { MarchingSquares } from "./marchingsquares.js";
 
 import { ClearAction } from "./actions/clearAction.js";
 import { ActionHistory } from "./actions/actionHistory.js";
+import { SaveFile } from "./saveFile.js";
 
 const canvas = document.getElementById("glCanvas");
 
@@ -19,6 +20,10 @@ const gridResolutionSelect = document.getElementById("gridResolution");
 const undoButton = document.getElementById("undoButton");
 const redoButton = document.getElementById("redoButton");
 const clearButton = document.getElementById("clearButton");
+
+const saveButton = document.getElementById("saveButton");
+const loadButton = document.getElementById("loadButton");
+const loadFileInput = document.getElementById("loadFileInput");
 
 const renderer = new Renderer(canvas);
 const marchingSquares = new MarchingSquares();
@@ -134,6 +139,50 @@ redoButton.addEventListener("click", () => {
 
     updateHistoryButtons();
     render();
+});
+
+saveButton.addEventListener("click", () => {
+    const fileName = prompt("Save project as:", "marching-squares.json");
+
+    if (!fileName || !fileName.trim()) {
+        return;
+    }
+
+    SaveFile.save(grid.width, history, fileName.trim());
+});
+
+loadButton.addEventListener("click", () => {
+    loadFileInput.click();
+});
+
+loadFileInput.addEventListener("change", async () => {
+    const file = loadFileInput.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    try {
+        input.cancelStroke();
+
+        const project = await SaveFile.load(file);
+
+        grid = new Grid(project.gridSize, project.gridSize);
+        input.setGrid(grid);
+
+        history.load(project.actions);
+        history.rebuild(grid);
+
+        gridResolutionSelect.value = String(project.gridSize);
+
+        updateHistoryButtons();
+        render();
+    } catch (error) {
+        console.error(error);
+        alert("Could not load the project file.");
+    }
+
+    loadFileInput.value = "";
 });
 
 updateHistoryButtons();

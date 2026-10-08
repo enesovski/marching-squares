@@ -10,6 +10,15 @@ export class StrokeAction extends Action {
         this.points = [];
     }
 
+    toData() {
+        return {
+            type: "stroke",
+            brushType: this.brushType,
+            brushSize: this.brushSize,
+            points: this.points
+        };
+    }
+
     addPoint(x, y) {
         const lastPoint = this.points[this.points.length - 1];
 

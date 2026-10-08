@@ -5,6 +5,15 @@ export class ActionHistory {
         this.redoActions = [];
     }
 
+    getActionsData() {
+        return this.actions.map(action => action.toData());
+    }
+
+    load(actions) {
+        this.actions = actions;
+        this.redoActions = [];
+    }
+
     commit(action) {
         this.actions.push(action);
         this.redoActions.length = 0;
@@ -61,4 +70,6 @@ export class ActionHistory {
     canRedo() {
         return this.redoActions.length > 0;
     }
+
+    
 }
