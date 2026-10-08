@@ -10,14 +10,16 @@ export class SaveFile {
             actions: history.getActionsData()
         };
 
-        const json = JSON.stringify(data, null, 2);
+        const json = JSON.stringify(data);
         const blob = new Blob([json], { type: "application/json" });
-
         const url = URL.createObjectURL(blob);
 
         const link = document.createElement("a");
         link.href = url;
-        link.download = fileName.toLowerCase().endsWith(".json") ? fileName : `${fileName}.json`;
+        link.download = fileName.toLowerCase().endsWith(".json")
+            ? fileName
+            : `${fileName}.json`;
+
         link.click();
 
         URL.revokeObjectURL(url);
@@ -75,15 +77,22 @@ export class SaveFile {
         }
 
         const { minSize, maxSize, sizeStep } = Config.brush;
+
         if (!Number.isInteger(action.brushSize) ||
-            action.brushSize < minSize || action.brushSize > maxSize ||
+            action.brushSize < minSize ||
+            action.brushSize > maxSize ||
             (action.brushSize - minSize) % sizeStep !== 0) {
             throw new Error("Invalid brush size.");
         }
 
         if (!Array.isArray(action.points) || action.points.some(point =>
-            !point || !Number.isInteger(point.x) || !Number.isInteger(point.y) ||
-            point.x < 0 || point.x >= gridSize || point.y < 0 || point.y >= gridSize)) {
+            !point ||
+            !Number.isInteger(point.x) ||
+            !Number.isInteger(point.y) ||
+            point.x < 0 ||
+            point.x >= gridSize ||
+            point.y < 0 ||
+            point.y >= gridSize)) {
             throw new Error("Invalid stroke points.");
         }
     }

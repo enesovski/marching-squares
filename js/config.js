@@ -24,7 +24,8 @@ export const Config = {
 
     save: {
         version: 1,
-        defaultFileName: "marching-squares.json"
+        defaultFileName: "marching-squares.json",
+        preferredDirectory: "D:\\Onedrive\\Desktop\\Bilkent(ALLAHIN BELASI)\\Semester 6\\CS 465\\Projects\\Project 1\\Code\\marching-squares"
     },
 
     defaultGridSize: 40

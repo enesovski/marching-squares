@@ -383,10 +383,21 @@ input[type="color"] {
 }
 
 .status-info {
+    display: flex;
+    align-items: center;
+    gap: 0;
+
     margin-left: auto;
+
     color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
 }
 
+.status-info span + span::before {
+    content: "•";
+    margin: 0 8px;
+    color: var(--border-light);
+}
 
 /* Helpers */
 

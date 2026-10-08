@@ -19,27 +19,32 @@ export class StrokeAction extends Action {
         };
     }
 
-addPoint(x, y) {
-    if (this.points.length === 0) {
-        const point = { x, y };
-        this.points.push(point);
-        return [point];
+    addPoint(x, y) {
+        if (this.points.length === 0) {
+            const point = { x, y };
+            this.points.push(point);
+            return [point];
+        }
+
+        const lastPoint = this.points[this.points.length - 1];
+
+        if (lastPoint.x === x && lastPoint.y === y) {
+            return [];
+        }
+
+        const newPoints = this.getLinePoints(
+            lastPoint.x,
+            lastPoint.y,
+            x,
+            y
+        );
+
+        for (const point of newPoints) {
+            this.points.push(point);
+        }
+
+        return newPoints;
     }
-
-    const lastPoint = this.points[this.points.length - 1];
-
-    if (lastPoint.x === x && lastPoint.y === y) {
-        return [];
-    }
-
-    const newPoints = this.getLinePoints(lastPoint.x, lastPoint.y, x, y);
-
-    for (const point of newPoints) {
-        this.points.push(point);
-    }
-
-    return newPoints;
-}
 
     getLinePoints(startX, startY, endX, endY) {
         const points = [];
@@ -81,6 +86,7 @@ addPoint(x, y) {
 
         return points;
     }
+
     apply(grid) {
         for (const point of this.points) {
             this.applyPoint(grid, point);

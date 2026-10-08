@@ -51,6 +51,12 @@ const controls = {
         save: document.getElementById("saveButton"),
         load: document.getElementById("loadButton"),
         input: document.getElementById("loadFileInput")
+    },
+
+    status: {
+        view: document.getElementById("statusView"),
+        grid: document.getElementById("statusGrid"),
+        zoom: document.getElementById("statusZoom")
     }
 };
 
@@ -83,6 +89,7 @@ input.setBrushSize(Number(controls.brush.size.value));
 
 function renderScene() {
     sceneRenderer.render(grid, viewSettings);
+    updateStatusBar();
 }
 
 function handleActionCompleted(action) {
@@ -129,6 +136,14 @@ function updateViewControls() {
 function updateHistoryControls() {
     controls.history.undo.disabled = !history.canUndo();
     controls.history.redo.disabled = !history.canRedo();
+}
+
+function updateStatusBar() {
+    controls.status.view.textContent =
+        viewSettings.mode === ViewMode.GRID ? "Grid" : "Marching";
+
+    controls.status.grid.textContent = `${grid.width} × ${grid.height}`;
+    controls.status.zoom.textContent = `${Math.round(camera.zoom * 100)}%`;
 }
 
 async function loadProject(file) {
@@ -235,20 +250,7 @@ controls.history.redo.addEventListener("click", () => {
 });
 
 controls.file.save.addEventListener("click", () => {
-    const fileName = prompt(
-        "Save project as:",
-        "marching-squares.json"
-    );
-
-    if (!fileName || !fileName.trim()) {
-        return;
-    }
-
-    SaveFile.save(
-        grid.width,
-        history,
-        fileName.trim()
-    );
+    SaveFile.save(grid.width, history);
 });
 
 controls.file.load.addEventListener("click", () => {
