@@ -19,19 +19,68 @@ export class StrokeAction extends Action {
         };
     }
 
-    addPoint(x, y) {
-        const lastPoint = this.points[this.points.length - 1];
-
-        if (lastPoint && lastPoint.x === x && lastPoint.y === y) {
-            return null;
-        }
-
+addPoint(x, y) {
+    if (this.points.length === 0) {
         const point = { x, y };
         this.points.push(point);
-
-        return point;
+        return [point];
     }
 
+    const lastPoint = this.points[this.points.length - 1];
+
+    if (lastPoint.x === x && lastPoint.y === y) {
+        return [];
+    }
+
+    const newPoints = this.getLinePoints(lastPoint.x, lastPoint.y, x, y);
+
+    for (const point of newPoints) {
+        this.points.push(point);
+    }
+
+    return newPoints;
+}
+
+    getLinePoints(startX, startY, endX, endY) {
+        const points = [];
+
+        let x = startX;
+        let y = startY;
+
+        const dx = endX - startX;
+        const dy = endY - startY;
+
+        const stepX = Math.sign(dx);
+        const stepY = Math.sign(dy);
+
+        const distanceX = Math.abs(dx);
+        const distanceY = Math.abs(dy);
+
+        let movedX = 0;
+        let movedY = 0;
+
+        while (movedX < distanceX || movedY < distanceY) {
+            const progressX = distanceX === 0
+                ? Infinity
+                : (movedX + 0.5) / distanceX;
+
+            const progressY = distanceY === 0
+                ? Infinity
+                : (movedY + 0.5) / distanceY;
+
+            if (progressX <= progressY && movedX < distanceX) {
+                x += stepX;
+                movedX++;
+            } else {
+                y += stepY;
+                movedY++;
+            }
+
+            points.push({ x, y });
+        }
+
+        return points;
+    }
     apply(grid) {
         for (const point of this.points) {
             this.applyPoint(grid, point);

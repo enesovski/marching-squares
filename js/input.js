@@ -83,13 +83,16 @@ export class Input {
             return;
         }
 
-        const addedPoint = this.currentStroke.addPoint(point.x, point.y);
+        const addedPoints = this.currentStroke.addPoint(point.x, point.y);
 
-        if (!addedPoint) {
+        if (addedPoints.length === 0) {
             return;
         }
 
-        this.currentStroke.applyPoint(this.grid, addedPoint);
+        for (const addedPoint of addedPoints) {
+            this.currentStroke.applyPoint(this.grid, addedPoint);
+        }
+
         this.onChange();
     }
 
