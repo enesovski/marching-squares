@@ -18,6 +18,7 @@ export class Renderer {
 
         this.zoomLocation = this.gl.getUniformLocation(this.shaderProgram, "uZoom");
         this.panLocation = this.gl.getUniformLocation(this.shaderProgram, "uPan");
+        this.aspectRatioLocation = this.gl.getUniformLocation(this.shaderProgram, "uAspectRatio");
 
         this.workspaceColor = [0.10, 0.11, 0.13];
         this.boardColor = [0.9, 0.9, 0.9];
@@ -31,11 +32,29 @@ export class Renderer {
     }
 
     clearWorkspace() {
+        this.resizeToDisplaySize();
+
         const gl = this.gl;
 
         gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         gl.clearColor(...this.workspaceColor, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+
+    resizeToDisplaySize() {
+        const width = Math.round(this.canvas.clientWidth);
+        const height = Math.round(this.canvas.clientHeight);
+
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+
+        if (this.canvas.width !== width || this.canvas.height !== height) {
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
+
+        this.camera.setAspectRatio(width / height);
     }
 
     drawBoard() {
@@ -204,6 +223,7 @@ export class Renderer {
 
         gl.uniform1f(this.zoomLocation, this.camera.zoom);
         gl.uniform2f(this.panLocation, this.camera.pan.x, this.camera.pan.y);
+        gl.uniform1f(this.aspectRatioLocation, this.camera.aspectRatio);
     }
 
     setColor(r, g, b, a = 1.0) {
@@ -231,9 +251,12 @@ export class Renderer {
 
             uniform float uZoom;
             uniform vec2 uPan;
+            uniform float uAspectRatio;
 
             void main() {
                 vec2 position = aPosition * uZoom + uPan;
+                position.x /= uAspectRatio;
+
                 gl_Position = vec4(position, 0.0, 1.0);
             }
         `;
