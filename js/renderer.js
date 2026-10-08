@@ -1,7 +1,9 @@
 export class Renderer {
 
-    constructor(canvas) {
+    constructor(canvas, camera) {
         this.canvas = canvas;
+        this.camera = camera;
+
         this.gl = canvas.getContext("webgl");
 
         if (!this.gl) {
@@ -14,11 +16,21 @@ export class Renderer {
         this.positionLocation = this.gl.getAttribLocation(this.shaderProgram, "aPosition");
         this.colorLocation = this.gl.getUniformLocation(this.shaderProgram, "uColor");
 
+        this.zoomLocation = this.gl.getUniformLocation(this.shaderProgram, "uZoom");
+        this.panLocation = this.gl.getUniformLocation(this.shaderProgram, "uPan");
+
         this.backgroundColor = [0.9, 0.9, 0.9];
         this.fillColor = [0.15, 0.15, 0.15];
         this.boundaryColor = [0.8, 0.1, 0.1];
 
         this.gl.useProgram(this.shaderProgram);
+    }
+
+    applyCamera() {
+        const gl = this.gl;
+
+        gl.uniform1f(this.zoomLocation, this.camera.zoom);
+        gl.uniform2f(this.panLocation, this.camera.pan.x,this.camera.pan.y);
     }
 
     clear() {
@@ -38,11 +50,16 @@ export class Renderer {
     createShaderProgram() {
         const gl = this.gl;
 
+        //pan is handled in vertex shader
         const vertexShaderSource = `
             attribute vec2 aPosition;
 
+            uniform float uZoom;
+            uniform vec2 uPan;
+
             void main() {
-                gl_Position = vec4(aPosition, 0.0, 1.0);
+                vec2 position = aPosition * uZoom + uPan;
+                gl_Position = vec4(position, 0.0, 1.0);
             }
         `;
 
@@ -120,13 +137,16 @@ export class Renderer {
         const vertexData = new Float32Array(vertices);
 
         gl.useProgram(this.shaderProgram);
+
+        this.applyCamera();
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.DYNAMIC_DRAW);
 
         gl.enableVertexAttribArray(this.positionLocation);
         gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, 0, 0);
     }
-
+    
     drawGrid(grid) {
         const gl = this.gl;
         const vertices = [];

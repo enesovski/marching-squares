@@ -2,9 +2,10 @@ import { StrokeAction } from "./actions/strokeAction.js";
 
 export class Input {
 
-    constructor(canvas, grid, onChange, onActionCompleted) {
+    constructor(canvas, grid, camera, onChange, onActionCompleted) {
         this.canvas = canvas;
         this.grid = grid;
+        this.camera = camera;
 
         this.onChange = onChange;
         this.onActionCompleted = onActionCompleted;
@@ -14,28 +15,58 @@ export class Input {
 
         this.currentStroke = null;
 
+        this.isPanning = false;
+        this.lastPanPoint = null;
+
         canvas.addEventListener("mousedown", (event) => {
-            if (event.button !== 0) {
+            if (event.button === 1) {
+                event.preventDefault();
+                this.startPan(event);
                 return;
             }
 
-            this.startStroke(event);
+            if (event.button === 0) {
+                this.startStroke(event);
+            }
         });
 
         canvas.addEventListener("mousemove", (event) => {
-            if (!this.currentStroke) {
+            if (this.isPanning) {
+                this.continuePan(event);
                 return;
             }
 
-            this.continueStroke(event);
+            if (this.currentStroke) {
+                this.continueStroke(event);
+            }
         });
 
         window.addEventListener("mouseup", (event) => {
-            if (event.button !== 0) {
+            if (event.button === 1) {
+                this.endPan();
                 return;
             }
 
-            this.endStroke();
+            if (event.button === 0) {
+                this.endStroke();
+            }
+        });
+
+        canvas.addEventListener("wheel", (event) => {
+            event.preventDefault();
+
+            const point = this.getClipPosition(event);
+
+            const factor = event.deltaY < 0
+                ? 1.1
+                : 1 / 1.1;
+
+            this.camera.zoomAt(point, factor);
+            this.onChange();
+        }, { passive: false });
+
+        canvas.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
         });
     }
 
@@ -96,18 +127,45 @@ export class Input {
         this.onChange();
     }
 
-    getGridPosition(event) {
+    startPan(event) {
+        this.isPanning = true;
+        this.lastPanPoint = this.getClipPosition(event);
+    }
+
+    continuePan(event) {
+        const point = this.getClipPosition(event);
+
+        const dx = point.x - this.lastPanPoint.x;
+        const dy = point.y - this.lastPanPoint.y;
+
+        this.camera.panBy(dx, dy);
+
+        this.lastPanPoint = point;
+
+        this.onChange();
+    }
+
+    endPan() {
+        this.isPanning = false;
+        this.lastPanPoint = null;
+    }
+
+    getClipPosition(event) {
         const rect = this.canvas.getBoundingClientRect();
 
-        const mouseX = event.clientX - rect.left;
-        const mouseY = event.clientY - rect.top;
+        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = 1 - ((event.clientY - rect.top) / rect.height) * 2;
 
-        const cellWidth = rect.width / this.grid.width;
-        const cellHeight = rect.height / this.grid.height;
+        return { x, y };
+    }
+
+    getGridPosition(event) {
+        const clipPoint = this.getClipPosition(event);
+        const worldPoint = this.camera.clipToWorld(clipPoint);
 
         return {
-            x: Math.floor(mouseX / cellWidth),
-            y: Math.floor(mouseY / cellHeight)
+            x: Math.floor(((worldPoint.x + 1) / 2) * this.grid.width),
+            y: Math.floor(((1 - worldPoint.y) / 2) * this.grid.height)
         };
     }
 }

@@ -2,6 +2,7 @@ import { Renderer } from "./renderer.js";
 import { Grid } from "./grid.js";
 import { Input } from "./input.js";
 import { MarchingSquares } from "./marchingsquares.js";
+import { Camera } from "./camera.js";
 
 import { ClearAction } from "./actions/clearAction.js";
 import { ActionHistory } from "./actions/actionHistory.js";
@@ -29,7 +30,8 @@ const saveButton = document.getElementById("saveButton");
 const loadButton = document.getElementById("loadButton");
 const loadFileInput = document.getElementById("loadFileInput");
 
-const renderer = new Renderer(canvas);
+const camera = new Camera();
+const renderer = new Renderer(canvas, camera);
 const marchingSquares = new MarchingSquares();
 const history = new ActionHistory();
 
@@ -70,7 +72,7 @@ function onActionCompleted(action) {
     updateHistoryButtons();
 }
 
-const input = new Input(canvas, grid, render, onActionCompleted);
+const input = new Input(canvas, grid, camera, render, onActionCompleted);
 
 input.setBrushType(brushTypeSelect.value);
 input.setBrushSize(Number(brushSizeSlider.value));
@@ -195,6 +197,8 @@ loadFileInput.addEventListener("change", async () => {
 
         history.load(project.actions);
         history.rebuild(grid);
+
+        camera.reset();
 
         gridResolutionSelect.value = String(project.gridSize);
 
