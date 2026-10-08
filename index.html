@@ -3,52 +3,143 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>CS465 Assignment 1</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marching Squares Editor</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <button id="toggleView">Switch to Marching Squares</button>
+    <div class="app-shell">
 
-    <button id="toggleMarchingMode">Marching Mode: Lines</button>
+        <header class="topbar">
+            <div class="brand">Marching Squares</div>
 
-    <label for="brushType">Brush:</label>
-    <select id="brushType"></select>
+            <div class="view-switcher">
+                <button id="gridViewButton" type="button" aria-pressed="true">Grid</button>
+                <button id="marchingViewButton" type="button" aria-pressed="false">Marching</button>
+            </div>
 
-    <label for="brushSize">Brush Size:</label>
-    <input
-        id="brushSize"
-        type="range">
-    <span id="brushSizeValue"></span>
+            <div class="topbar-actions">
+                <button id="undoButton" type="button" disabled>Undo</button>
+                <button id="redoButton" type="button" disabled>Redo</button>
 
-    <label for="gridResolution">Grid:</label>
-    <select id="gridResolution"></select>
+                <div class="toolbar-separator"></div>
 
-    <label for="backgroundColor">Background:</label>
-    <input id="backgroundColor" type="color">
+                <button id="saveButton" type="button">Save</button>
+                <button id="loadButton" type="button">Load</button>
+            </div>
+        </header>
 
-    <label for="fillColor">Fill:</label>
-    <input id="fillColor" type="color">
+        <div class="editor-body">
 
-    <label for="boundaryColor">Boundary:</label>
-    <input id="boundaryColor" type="color">
+            <aside class="sidebar">
 
-    <button id="undoButton" disabled>Undo</button>
-    <button id="redoButton" disabled>Redo</button>
-    <button id="clearButton">Clear</button>
+                <section class="panel-section">
+                    <h2>Brush</h2>
 
-    <button id="saveButton">Save</button>
-    <button id="loadButton">Load</button>
+                    <div class="property">
+                        <label for="brushType">Shape</label>
+                        <select id="brushType">
+                            <option value="circle">Circle</option>
+                            <option value="square">Square</option>
+                        </select>
+                    </div>
+
+                    <div class="property">
+                        <label for="brushSize">Size</label>
+
+                        <div class="slider-control">
+                            <input id="brushSize" type="range" min="1" max="9" step="2" value="1">
+                            <span id="brushSizeValue">1</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>Grid</h2>
+
+                    <div class="property">
+                        <label for="gridResolution">Resolution</label>
+
+                        <select id="gridResolution">
+                            <option value="20">20 × 20</option>
+                            <option value="40" selected>40 × 40</option>
+                            <option value="80">80 × 80</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>Display</h2>
+
+                    <label class="checkbox-control">
+                        <input id="gridLinesToggle" type="checkbox" checked>
+                        <span>Grid Lines</span>
+                    </label>
+
+                    <div id="marchingDisplayControls" hidden>
+                        <label class="checkbox-control">
+                            <input id="marchingFillToggle" type="checkbox" checked>
+                            <span>Fill</span>
+                        </label>
+
+                        <label class="checkbox-control">
+                            <input id="marchingBoundaryToggle" type="checkbox" checked>
+                            <span>Boundary</span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>Colors</h2>
+
+                    <div class="color-property">
+                        <label for="boardColor">Background</label>
+                        <input id="boardColor" type="color" value="#E6E6E6">
+                    </div>
+
+                    <div class="color-property">
+                        <label for="fillColor">Fill</label>
+                        <input id="fillColor" type="color" value="#262626">
+                    </div>
+
+                    <div class="color-property">
+                        <label for="boundaryColor">Boundary</label>
+                        <input id="boundaryColor" type="color" value="#CC1A1A">
+                    </div>
+                </section>
+
+                <section class="panel-section panel-actions">
+                    <button id="clearButton" type="button">Clear Canvas</button>
+                </section>
+
+            </aside>
+
+            <main class="workspace">
+                <div class="canvas-stage">
+                    <canvas id="glCanvas" width="800" height="800"></canvas>
+                </div>
+            </main>
+
+        </div>
+
+        <footer class="statusbar">
+            <div class="status-help">
+                <span><strong>LMB</strong> Draw</span>
+                <span><strong>MMB</strong> Pan</span>
+                <span><strong>Wheel</strong> Zoom</span>
+            </div>
+
+            <div class="status-info">
+                WebGL
+            </div>
+        </footer>
+
+    </div>
 
     <input id="loadFileInput" type="file" accept=".json" hidden>
 
-    <br><br>
-
-    <canvas id="glCanvas" width="800" height="800"></canvas>
-
     <script type="module" src="./js/main.js"></script>
-
 </body>
 
 </html>

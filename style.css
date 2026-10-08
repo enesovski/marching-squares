@@ -1,0 +1,395 @@
+:root {
+    --topbar-height: 44px;
+    --statusbar-height: 28px;
+    --sidebar-width: 228px;
+
+    --bg-workspace: #15181b;
+    --bg-panel: #1f2226;
+    --bg-topbar: #202328;
+    --bg-control: #292d32;
+    --bg-control-hover: #32373d;
+    --bg-control-active: #3a4047;
+
+    --border: #363b42;
+    --border-light: #454b53;
+
+    --text-primary: #e7e9ec;
+    --text-secondary: #a9afb7;
+    --text-muted: #717780;
+
+    --accent: #4c9aff;
+
+    --radius: 4px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 13px;
+    color: var(--text-primary);
+    background: var(--bg-workspace);
+}
+
+button,
+select,
+input {
+    font: inherit;
+}
+
+
+/* App layout */
+
+.app-shell {
+    display: grid;
+    grid-template-rows:
+        var(--topbar-height)
+        minmax(0, 1fr)
+        var(--statusbar-height);
+
+    width: 100vw;
+    height: 100vh;
+}
+
+
+/* Topbar */
+
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    padding: 0 8px;
+
+    background: var(--bg-topbar);
+    border-bottom: 1px solid var(--border);
+}
+
+.brand {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.view-switcher {
+    display: flex;
+    gap: 2px;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    margin-left: auto;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    margin: 0 3px;
+
+    background: var(--border);
+}
+
+
+/* Buttons */
+
+button {
+    height: 28px;
+    padding: 0 10px;
+
+    color: var(--text-primary);
+    background: var(--bg-control);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+    background: var(--bg-control-hover);
+    border-color: var(--border-light);
+}
+
+button:active:not(:disabled) {
+    background: var(--bg-control-active);
+}
+
+button:disabled {
+    color: var(--text-muted);
+    opacity: 0.55;
+    cursor: default;
+}
+
+button[aria-pressed="true"] {
+    color: #fff;
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+
+/* Editor */
+
+.editor-body {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+
+    min-width: 0;
+    min-height: 0;
+}
+
+
+/* Sidebar */
+
+.sidebar {
+    min-height: 0;
+    overflow-y: auto;
+
+    padding: 8px;
+
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+}
+
+.panel-section {
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-section:first-child {
+    padding-top: 6px;
+}
+
+.panel-section:last-child {
+    border-bottom: none;
+}
+
+.panel-section h2 {
+    margin: 0 0 12px;
+
+    color: var(--text-secondary);
+
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+
+/* Properties */
+
+.property {
+    margin-bottom: 12px;
+}
+
+.property:last-child {
+    margin-bottom: 0;
+}
+
+.property > label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+select {
+    width: 100%;
+    height: 29px;
+
+    padding: 0 8px;
+
+    color: var(--text-primary);
+    background: var(--bg-control);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    outline: none;
+}
+
+select:hover {
+    border-color: var(--border-light);
+}
+
+select:focus {
+    border-color: var(--accent);
+}
+
+
+/* Slider */
+
+.slider-control {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 24px;
+    align-items: center;
+    gap: 9px;
+}
+
+.slider-control input[type="range"] {
+    width: 100%;
+    margin: 0;
+}
+
+.slider-control span {
+    color: var(--text-secondary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Checkboxes */
+
+.checkbox-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 28px;
+
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.checkbox-control input {
+    margin: 0;
+}
+
+#marchingDisplayControls {
+    margin-top: 2px;
+}
+
+
+/* Colors */
+
+.color-property {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 34px;
+}
+
+.color-property label {
+    color: var(--text-secondary);
+}
+
+input[type="color"] {
+    width: 42px;
+    height: 25px;
+
+    padding: 2px;
+
+    background: var(--bg-control);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    cursor: pointer;
+}
+
+.panel-actions {
+    padding-top: 14px;
+}
+
+#clearButton {
+    width: 100%;
+}
+
+
+/* Workspace */
+
+.workspace {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+    min-height: 0;
+
+    padding: 10px;
+
+    overflow: hidden;
+
+    background: var(--bg-workspace);
+}
+
+.canvas-stage {
+    width: min(
+        calc(100vw - var(--sidebar-width) - 20px),
+        calc(100vh - var(--topbar-height) - var(--statusbar-height) - 20px)
+    );
+
+    height: min(
+        calc(100vw - var(--sidebar-width) - 20px),
+        calc(100vh - var(--topbar-height) - var(--statusbar-height) - 20px)
+    );
+
+    max-width: 100%;
+    max-height: 100%;
+
+    flex: none;
+}
+
+#glCanvas {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    cursor: crosshair;
+}
+
+
+/* Status bar */
+
+.statusbar {
+    display: flex;
+    align-items: center;
+
+    padding: 0 10px;
+
+    color: var(--text-secondary);
+    background: var(--bg-topbar);
+
+    border-top: 1px solid var(--border);
+
+    font-size: 11px;
+    user-select: none;
+}
+
+.status-help {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.status-help strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.status-info {
+    margin-left: auto;
+    color: var(--text-muted);
+}
+
+
+/* Helpers */
+
+[hidden] {
+    display: none !important;
+}
