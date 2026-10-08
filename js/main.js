@@ -3,6 +3,7 @@ import { Grid } from "./grid.js";
 import { Input } from "./input.js";
 import { MarchingSquares } from "./marchingsquares.js";
 import { Camera } from "./camera.js";
+import { Config } from "./config.js";
 
 import { ClearAction } from "./actions/clearAction.js";
 import { ActionHistory } from "./actions/actionHistory.js";
@@ -30,16 +31,31 @@ const saveButton = document.getElementById("saveButton");
 const loadButton = document.getElementById("loadButton");
 const loadFileInput = document.getElementById("loadFileInput");
 
+for (const type of Config.brush.types) {
+    brushTypeSelect.add(new Option(type.charAt(0).toUpperCase() + type.slice(1), type));
+}
+brushTypeSelect.value = Config.brush.defaultType;
+brushSizeSlider.min = Config.brush.minSize;
+brushSizeSlider.max = Config.brush.maxSize;
+brushSizeSlider.step = Config.brush.sizeStep;
+brushSizeSlider.value = Config.brush.defaultSize;
+brushSizeValue.textContent = Config.brush.defaultSize;
+
+for (const size of Config.gridSizes) {
+    gridResolutionSelect.add(new Option(`${size} x ${size}`, String(size)));
+}
+gridResolutionSelect.value = String(Config.defaultGridSize);
+
+backgroundColorInput.value = Config.colors.background;
+fillColorInput.value = Config.colors.fill;
+boundaryColorInput.value = Config.colors.boundary;
+
 const camera = new Camera();
 const renderer = new Renderer(canvas, camera);
 const marchingSquares = new MarchingSquares();
 const history = new ActionHistory();
 
-renderer.setBackgroundColor(backgroundColorInput.value);
-renderer.setFillColor(fillColorInput.value);
-renderer.setBoundaryColor(boundaryColorInput.value);
-
-let grid = new Grid(40, 40);
+let grid = new Grid(Config.defaultGridSize, Config.defaultGridSize);
 
 let viewMode = "grid";
 let marchingMode = "lines";
@@ -136,6 +152,8 @@ gridResolutionSelect.addEventListener("change", () => {
     input.setGrid(grid);
 
     history.reset();
+
+    camera.reset(); 
     updateHistoryButtons();
 
     render();
@@ -167,7 +185,7 @@ redoButton.addEventListener("click", () => {
 });
 
 saveButton.addEventListener("click", () => {
-    const fileName = prompt("Save project as:", "marching-squares.json");
+    const fileName = prompt("Save project as:", Config.save.defaultFileName);
 
     if (!fileName || !fileName.trim()) {
         return;

@@ -1,11 +1,13 @@
+import { Config } from "./config.js";
+
 export class Camera {
 
     constructor() {
         this.zoom = 1;
         this.pan = { x: 0, y: 0 };
 
-        this.minZoom = 0.5;
-        this.maxZoom = 8;
+        this.minZoom = Config.camera.minZoom;
+        this.maxZoom = Config.camera.maxZoom;
     }
 
     clipToWorld(point) {

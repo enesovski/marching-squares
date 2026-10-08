@@ -1,4 +1,5 @@
 import { StrokeAction } from "./actions/strokeAction.js";
+import { Config } from "./config.js";
 
 export class Input {
 
@@ -10,8 +11,8 @@ export class Input {
         this.onChange = onChange;
         this.onActionCompleted = onActionCompleted;
 
-        this.brushType = "circle";
-        this.brushSize = 1;
+        this.brushType = Config.brush.defaultType;
+        this.brushSize = Config.brush.defaultSize;
 
         this.currentStroke = null;
 
@@ -58,8 +59,8 @@ export class Input {
             const point = this.getClipPosition(event);
 
             const factor = event.deltaY < 0
-                ? 1.1
-                : 1 / 1.1;
+                ? Config.camera.zoomFactor
+                : 1 / Config.camera.zoomFactor;
 
             this.camera.zoomAt(point, factor);
             this.onChange();

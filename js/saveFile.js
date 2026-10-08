@@ -1,10 +1,11 @@
 import { ActionFactory } from "./actions/actionFactory.js";
+import { Config } from "./config.js";
 
 export class SaveFile {
 
-    static save(gridSize, history, fileName = "marching-squares.json") {
+    static save(gridSize, history, fileName = Config.save.defaultFileName) {
         const data = {
-            version: 1,
+            version: Config.save.version,
             gridSize: gridSize,
             actions: history.getActionsData()
         };
@@ -39,16 +40,51 @@ export class SaveFile {
     }
 
     static validate(data) {
-        if (data.version !== 1) {
+        if (!data || typeof data !== "object" || Array.isArray(data)) {
+            throw new Error("Invalid project file.");
+        }
+
+        if (data.version !== Config.save.version) {
             throw new Error("Unsupported file version.");
         }
 
-        if (!Number.isInteger(data.gridSize) || data.gridSize <= 0) {
+        if (!Number.isInteger(data.gridSize) || !Config.gridSizes.includes(data.gridSize)) {
             throw new Error("Invalid grid size.");
         }
 
         if (!Array.isArray(data.actions)) {
             throw new Error("Invalid actions.");
+        }
+
+        for (const action of data.actions) {
+            this.validateAction(action, data.gridSize);
+        }
+    }
+
+    static validateAction(action, gridSize) {
+        if (action?.type === "clear") {
+            return;
+        }
+
+        if (action?.type !== "stroke") {
+            throw new Error("Invalid action type.");
+        }
+
+        if (!Config.brush.types.includes(action.brushType)) {
+            throw new Error("Invalid brush type.");
+        }
+
+        const { minSize, maxSize, sizeStep } = Config.brush;
+        if (!Number.isInteger(action.brushSize) ||
+            action.brushSize < minSize || action.brushSize > maxSize ||
+            (action.brushSize - minSize) % sizeStep !== 0) {
+            throw new Error("Invalid brush size.");
+        }
+
+        if (!Array.isArray(action.points) || action.points.some(point =>
+            !point || !Number.isInteger(point.x) || !Number.isInteger(point.y) ||
+            point.x < 0 || point.x >= gridSize || point.y < 0 || point.y >= gridSize)) {
+            throw new Error("Invalid stroke points.");
         }
     }
 }

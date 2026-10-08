@@ -14,36 +14,25 @@
     <button id="toggleMarchingMode">Marching Mode: Lines</button>
 
     <label for="brushType">Brush:</label>
-    <select id="brushType">
-        <option value="circle">Circle</option>
-        <option value="square">Square</option>
-    </select>
+    <select id="brushType"></select>
 
     <label for="brushSize">Brush Size:</label>
     <input
         id="brushSize"
-        type="range"
-        min="1"
-        max="9"
-        step="2"
-        value="1">
-    <span id="brushSizeValue">1</span>
+        type="range">
+    <span id="brushSizeValue"></span>
 
     <label for="gridResolution">Grid:</label>
-    <select id="gridResolution">
-        <option value="20">20 x 20</option>
-        <option value="40" selected>40 x 40</option>
-        <option value="80">80 x 80</option>
-    </select>
+    <select id="gridResolution"></select>
 
     <label for="backgroundColor">Background:</label>
-    <input id="backgroundColor" type="color" value="#E6E6E6">
+    <input id="backgroundColor" type="color">
 
     <label for="fillColor">Fill:</label>
-    <input id="fillColor" type="color" value="#262626">
+    <input id="fillColor" type="color">
 
     <label for="boundaryColor">Boundary:</label>
-    <input id="boundaryColor" type="color" value="#CC1A1A">
+    <input id="boundaryColor" type="color">
 
     <button id="undoButton" disabled>Undo</button>
     <button id="redoButton" disabled>Redo</button>

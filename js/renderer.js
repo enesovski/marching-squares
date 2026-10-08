@@ -1,3 +1,5 @@
+import { Config } from "./config.js";
+
 export class Renderer {
 
     constructor(canvas, camera) {
@@ -19,9 +21,9 @@ export class Renderer {
         this.zoomLocation = this.gl.getUniformLocation(this.shaderProgram, "uZoom");
         this.panLocation = this.gl.getUniformLocation(this.shaderProgram, "uPan");
 
-        this.backgroundColor = [0.9, 0.9, 0.9];
-        this.fillColor = [0.15, 0.15, 0.15];
-        this.boundaryColor = [0.8, 0.1, 0.1];
+        this.backgroundColor = this.hexToRgb(Config.colors.background);
+        this.fillColor = this.hexToRgb(Config.colors.fill);
+        this.boundaryColor = this.hexToRgb(Config.colors.boundary);
 
         this.gl.useProgram(this.shaderProgram);
     }
