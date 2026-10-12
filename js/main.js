@@ -433,6 +433,47 @@ controls.file.input.addEventListener("change", async () => {
     }
 });
 
+//key listening
+document.addEventListener("keydown", event => {
+    const target = event.target;
+
+    if (target.matches("input, select, textarea") ||
+        target.isContentEditable) {
+        return;
+    }
+
+    const key = event.key.toLowerCase();
+    const ctrl = event.ctrlKey || event.metaKey;
+
+    if (ctrl) {
+        const actions = {
+            z: event.shiftKey ? controls.history.redo : controls.history.undo,
+            y: controls.history.redo,
+            s: controls.file.save
+        };
+
+        const button = actions[key];
+
+        if (button) {
+            event.preventDefault();
+            button.click();
+        }
+        return;
+    }
+
+    if (event.altKey) return;
+
+    const tools = {
+        b: "brush",
+        e: "erase",
+        h: "pan"
+    };
+
+    if (tools[key]) {
+        setTool(tools[key]);
+    }
+});
+
 // Initialization
 
 window.addEventListener("resize", renderScene);
