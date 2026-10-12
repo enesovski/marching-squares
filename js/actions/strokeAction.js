@@ -126,7 +126,7 @@ export class StrokeAction extends Action {
 
         for (let y = centerY - radius; y <= centerY + radius; y++) {
             for (let x = centerX - radius; x <= centerX + radius; x++) {
-                grid.setCell(x, y, 1);
+                grid.setCell(x, y, this.cellValue);
             }
         }
     }

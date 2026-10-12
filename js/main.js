@@ -225,7 +225,16 @@ function setTool(tool) {
 }
 
 
+
 function changeResolution(size) {
+    if (size === grid.width) return;
+
+    if (history.canUndo() &&
+        !confirm("Changing the grid resolution will clear your drawing. Continue?")) {
+        controls.grid.resolution.value = String(grid.width);
+        return;
+    }
+
     input.cancelStroke();
 
     grid = new Grid(size, size);
