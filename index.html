@@ -1,43 +1,125 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marching Squares Editor</title>
     <link rel="stylesheet" href="./style.css">
 </head>
-
 <body>
     <div class="app-shell">
-
         <header class="topbar">
-            <div class="brand">Marching Squares</div>
+            <div class="brand">
+                <svg class="icon brand-icon">
+                    <use href="./icons/editor.svg#grid"></use>
+                </svg>
+                <span>Marching Squares</span>
+            </div>
 
-            <div class="view-switcher">
-                <button id="gridViewButton" type="button" aria-pressed="true">Grid</button>
-                <button id="marchingViewButton" type="button" aria-pressed="false">Marching</button>
+            <span class="topbar-divider" aria-hidden="true"></span>
+
+            <div class="project-title">
+                <button id="projectTitleButton" class="project-title-button" type="button" title="Rename project">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#file"></use>
+                    </svg>
+                    <span id="projectTitleText" class="project-title-text">Untitled Project</span>
+                    <span id="unsavedIndicator" class="unsaved-indicator" hidden aria-label="Unsaved changes"></span>
+                    <svg class="icon icon-small edit-icon">
+                        <use href="./icons/editor.svg#pencil"></use>
+                    </svg>
+                </button>
+
+                <input id="projectTitleInput" type="text"
+                       aria-label="Project name"
+                       maxlength="60"
+                       spellcheck="false"
+                       hidden>
             </div>
 
             <div class="topbar-actions">
-                <button id="undoButton" type="button" disabled>Undo</button>
-                <button id="redoButton" type="button" disabled>Redo</button>
+                <button id="undoButton" class="icon-button" type="button" title="Undo" aria-label="Undo" disabled>
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#undo"></use>
+                    </svg>
+                </button>
 
-                <div class="toolbar-separator"></div>
+                <button id="redoButton" class="icon-button" type="button" title="Redo" aria-label="Redo" disabled>
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#redo"></use>
+                    </svg>
+                </button>
 
-                <button id="saveButton" type="button">Save</button>
-                <button id="loadButton" type="button">Load</button>
+                <span class="topbar-divider" aria-hidden="true"></span>
+
+                <button id="loadButton" class="icon-button" type="button" title="Open project" aria-label="Open project">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#folder-open"></use>
+                    </svg>
+                </button>
+
+                <button id="saveButton" class="primary-button" type="button">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#save"></use>
+                    </svg>
+                    <span>Save</span>
+                </button>
             </div>
         </header>
 
         <div class="editor-body">
+            <nav class="tool-rail" aria-label="Canvas tools">
+                <button id="brushToolButton" class="tool-button is-active"
+                        type="button" title="Brush" aria-label="Brush tool" aria-pressed="true">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#brush"></use>
+                    </svg>
+                </button>
 
-            <aside class="sidebar">
+                <button id="panToolButton" class="tool-button"
+                        type="button" title="Pan" aria-label="Pan tool" aria-pressed="false">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#hand"></use>
+                    </svg>
+                </button>
 
+                <span class="rail-divider" aria-hidden="true"></span>
+
+                <button id="zoomInButton" class="tool-button" type="button" title="Zoom in" aria-label="Zoom in">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#zoom-in"></use>
+                    </svg>
+                </button>
+
+                <button id="zoomOutButton" class="tool-button" type="button" title="Zoom out" aria-label="Zoom out">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#zoom-out"></use>
+                    </svg>
+                </button>
+
+                <button id="fitCanvasButton" class="tool-button" type="button" title="Reset view" aria-label="Reset view">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#maximize"></use>
+                    </svg>
+                </button>
+            </nav>
+
+            <main class="workspace" aria-label="Drawing workspace">
+                <canvas id="glCanvas" width="800" height="800"
+                        aria-label="Marching Squares drawing canvas"></canvas>
+
+                <div class="view-switcher" role="group" aria-label="Display mode">
+                    <button id="marchingViewButton" type="button" aria-pressed="false">Marching</button>
+                    <button id="gridViewButton" type="button" aria-pressed="true">Grid</button>
+                </div>
+            </main>
+
+            <aside class="inspector" aria-label="Editor properties">
                 <section class="panel-section">
                     <h2>Brush</h2>
 
-                    <div class="property">
+                    <div class="field">
                         <label for="brushType">Shape</label>
                         <select id="brushType">
                             <option value="circle">Circle</option>
@@ -45,22 +127,65 @@
                         </select>
                     </div>
 
-                    <div class="property">
-                        <label for="brushSize">Size</label>
-
-                        <div class="slider-control">
-                            <input id="brushSize" type="range" min="1" max="9" step="2" value="1">
-                            <span id="brushSizeValue">1</span>
+                    <div class="field">
+                        <div class="field-heading">
+                            <label for="brushSize">Size</label>
+                            <output id="brushSizeValue" for="brushSize">1</output>
                         </div>
+
+                        <input id="brushSize" type="range"
+                               min="1" max="9" step="2" value="1">
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>Appearance</h2>
+
+                    <div class="color-field">
+                        <label for="fillColor">Fill</label>
+                        <input id="fillColor" type="color" value="#262626">
+                    </div>
+
+                    <div class="color-field">
+                        <label for="boundaryColor">Boundary</label>
+                        <input id="boundaryColor" type="color" value="#CC1A1A">
+                    </div>
+
+                    <div class="color-field">
+                        <label for="boardColor">Background</label>
+                        <input id="boardColor" type="color" value="#E6E6E6">
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>Display</h2>
+
+                    <label class="toggle-field">
+                        <span>Grid Lines</span>
+                        <input id="gridLinesToggle" type="checkbox" checked>
+                        <span class="toggle-track" aria-hidden="true"></span>
+                    </label>
+
+                    <div id="marchingDisplayControls" hidden>
+                        <label class="toggle-field">
+                            <span>Fill</span>
+                            <input id="marchingFillToggle" type="checkbox" checked>
+                            <span class="toggle-track" aria-hidden="true"></span>
+                        </label>
+
+                        <label class="toggle-field">
+                            <span>Boundary</span>
+                            <input id="marchingBoundaryToggle" type="checkbox" checked>
+                            <span class="toggle-track" aria-hidden="true"></span>
+                        </label>
                     </div>
                 </section>
 
                 <section class="panel-section">
                     <h2>Grid</h2>
 
-                    <div class="property">
+                    <div class="field">
                         <label for="gridResolution">Resolution</label>
-
                         <select id="gridResolution">
                             <option value="20">20 × 20</option>
                             <option value="40" selected>40 × 40</option>
@@ -69,63 +194,20 @@
                     </div>
                 </section>
 
-                <section class="panel-section">
-                    <h2>Display</h2>
-
-                    <label class="checkbox-control">
-                        <input id="gridLinesToggle" type="checkbox" checked>
-                        <span>Grid Lines</span>
-                    </label>
-
-                    <div id="marchingDisplayControls" hidden>
-                        <label class="checkbox-control">
-                            <input id="marchingFillToggle" type="checkbox" checked>
-                            <span>Fill</span>
-                        </label>
-
-                        <label class="checkbox-control">
-                            <input id="marchingBoundaryToggle" type="checkbox" checked>
-                            <span>Boundary</span>
-                        </label>
-                    </div>
-                </section>
-
-                <section class="panel-section">
-                    <h2>Colors</h2>
-
-                    <div class="color-property">
-                        <label for="boardColor">Background</label>
-                        <input id="boardColor" type="color" value="#E6E6E6">
-                    </div>
-
-                    <div class="color-property">
-                        <label for="fillColor">Fill</label>
-                        <input id="fillColor" type="color" value="#262626">
-                    </div>
-
-                    <div class="color-property">
-                        <label for="boundaryColor">Boundary</label>
-                        <input id="boundaryColor" type="color" value="#CC1A1A">
-                    </div>
-                </section>
-
                 <section class="panel-section panel-actions">
-                    <button id="clearButton" type="button">Clear Canvas</button>
+                    <button id="clearButton" class="secondary-button" type="button">
+                        <svg class="icon">
+                            <use href="./icons/editor.svg#trash"></use>
+                        </svg>
+                        Clear Canvas
+                    </button>
                 </section>
-
             </aside>
-
-            <main class="workspace">
-                <div class="canvas-stage">
-                    <canvas id="glCanvas" width="800" height="800"></canvas>
-                </div>
-            </main>
-
         </div>
 
         <footer class="statusbar">
             <div class="status-help">
-                <span><strong>LMB</strong> Draw</span>
+                <span id="statusToolHelp"><strong>LMB</strong> Draw</span>
                 <span><strong>MMB</strong> Pan</span>
                 <span><strong>Wheel</strong> Zoom</span>
             </div>
@@ -136,12 +218,9 @@
                 <span id="statusZoom">100%</span>
             </div>
         </footer>
-
     </div>
 
-    <input id="loadFileInput" type="file" accept=".json" hidden>
-
+    <input id="loadFileInput" type="file" accept=".json,application/json" hidden>
     <script type="module" src="./js/main.js"></script>
 </body>
-
 </html>
