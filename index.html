@@ -69,6 +69,14 @@
                         title="Brush" aria-label="Brush" aria-pressed="true">
                     <svg class="icon"><use href="./icons/editor.svg#brush"></use></svg>
                 </button>
+                
+                <button id="eraseToolButton" class="tool-button" type="button"
+                        title="Eraser" aria-label="Eraser" aria-pressed="false">
+                    <svg class="icon">
+                        <use href="./icons/editor.svg#eraser"></use>
+                    </svg>
+                </button>
+
                 <button id="panToolButton" class="tool-button" type="button"
                         title="Pan" aria-label="Pan" aria-pressed="false">
                     <svg class="icon"><use href="./icons/editor.svg#hand"></use></svg>
@@ -94,6 +102,8 @@
                 <canvas id="glCanvas" width="800" height="800"
                         aria-label="Marching Squares drawing canvas"></canvas>
 
+                <div id="brushPreview" class="brush-preview" aria-hidden="true" hidden></div>
+                
                 <div class="view-switcher" role="group" aria-label="Display mode">
                     <button id="marchingViewButton" type="button" aria-pressed="false">Marching</button>
                     <button id="gridViewButton" type="button" aria-pressed="true">Grid</button>

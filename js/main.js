@@ -21,6 +21,7 @@ const controls = {
     },
     tools: {
         brush: document.getElementById("brushToolButton"),
+        erase: document.getElementById("eraseToolButton"),
         pan: document.getElementById("panToolButton"),
         zoomIn: document.getElementById("zoomInButton"),
         zoomOut: document.getElementById("zoomOutButton"),
@@ -86,12 +87,14 @@ renderer.setBoardColor(controls.colors.board.value);
 renderer.setFillColor(controls.colors.fill.value);
 renderer.setBoundaryColor(controls.colors.boundary.value);
 
+
 const input = new Input(
     canvas,
     grid,
     camera,
     renderScene,
-    handleActionCompleted
+    handleActionCompleted,
+    document.getElementById("brushPreview")
 );
 
 input.setBrushType(controls.brush.type.value);
@@ -105,6 +108,8 @@ function renderScene() {
 
     controls.status.grid.textContent = `${grid.width} × ${grid.height}`;
     controls.status.zoom.textContent = `${Math.round(camera.zoom * 100)}%`;
+
+    input.updatePreview();
 }
 
 function setDirty(value) {
@@ -198,34 +203,27 @@ function setViewMode(mode) {
     renderScene();
 }
 
+
 function setTool(tool) {
     activeTool = tool;
     input.setTool(tool);
 
-    controls.tools.brush.classList.toggle(
-        "is-active",
-        tool === "brush"
-    );
+    for (const name of ["brush", "erase", "pan"]) {
+        const selected = name === tool;
+        controls.tools[name].classList.toggle("is-active", selected);
+        controls.tools[name].setAttribute("aria-pressed", String(selected));
+    }
 
-    controls.tools.pan.classList.toggle(
-        "is-active",
-        tool === "pan"
-    );
+    const labels = {
+        brush: "Draw",
+        erase: "Erase",
+        pan: "Pan"
+    };
 
-    controls.tools.brush.setAttribute(
-        "aria-pressed",
-        String(tool === "brush")
-    );
-
-    controls.tools.pan.setAttribute(
-        "aria-pressed",
-        String(tool === "pan")
-    );
-
-    controls.status.toolHelp.innerHTML = tool === "brush"
-        ? "<strong>LMB</strong> Draw"
-        : "<strong>LMB</strong> Pan";
+    controls.status.toolHelp.innerHTML =
+        `<strong>LMB</strong> ${labels[tool]}`;
 }
+
 
 function changeResolution(size) {
     input.cancelStroke();
@@ -288,6 +286,10 @@ controls.tools.brush.addEventListener("click", () => {
 
 controls.tools.pan.addEventListener("click", () => {
     setTool("pan");
+});
+
+controls.tools.erase.addEventListener("click", () => {
+    setTool("erase");
 });
 
 controls.tools.zoomIn.addEventListener("click", () => {

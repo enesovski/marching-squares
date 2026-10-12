@@ -2,19 +2,23 @@ import { Action } from "./action.js";
 
 export class StrokeAction extends Action {
 
-    constructor(brushType, brushSize) {
+
+    constructor(brushType, brushSize, cellValue = 1) {
         super();
 
         this.brushType = brushType;
         this.brushSize = brushSize;
+        this.cellValue = cellValue;
         this.points = [];
     }
+
 
     toData() {
         return {
             type: "stroke",
             brushType: this.brushType,
             brushSize: this.brushSize,
+            cellValue: this.cellValue,
             points: this.points
         };
     }
@@ -111,7 +115,7 @@ export class StrokeAction extends Action {
                 const dy = y - centerY;
 
                 if (dx * dx + dy * dy <= radius * radius) {
-                    grid.setCell(x, y, 1);
+                    grid.setCell(x, y, this.cellValue);
                 }
             }
         }

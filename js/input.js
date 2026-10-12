@@ -3,7 +3,7 @@ import { StrokeAction } from "./actions/strokeAction.js";
 import { Config } from "./config.js";
 
 export class Input {
-    constructor(canvas, grid, camera, onChange, onActionCompleted) {
+    constructor(canvas, grid, camera, onChange, onActionCompleted, preview) {
         this.canvas = canvas;
         this.grid = grid;
         this.camera = camera;
@@ -15,6 +15,8 @@ export class Input {
         this.tool = "brush";
         this.currentStroke = null;
         this.isPanning = false;
+        this.preview = preview;
+
         this.lastPanPoint = null;
 
         canvas.addEventListener("mousedown", event => {
@@ -26,12 +28,24 @@ export class Input {
             }
         });
 
+
         canvas.addEventListener("mousemove", event => {
+            this.updatePreview(event);
+
             if (this.isPanning) {
                 this.continuePan(event);
             } else if (this.currentStroke) {
                 this.continueStroke(event);
             }
+        });
+
+        canvas.addEventListener("mouseenter", event => {
+            this.updatePreview(event);
+        });
+
+        canvas.addEventListener("mouseleave", () => {
+            this.lastPointer = null;
+            this.preview.hidden = true;
         });
 
         window.addEventListener("mouseup", event => {
@@ -50,20 +64,42 @@ export class Input {
         canvas.addEventListener("contextmenu", event => event.preventDefault());
     }
 
-    setGrid(grid) { this.grid = grid; }
-    setBrushType(type) { this.brushType = type; }
-    setBrushSize(size) { this.brushSize = size; }
+
+    setGrid(grid) {
+        this.grid = grid;
+        this.updatePreview();
+    }
+
+    setBrushType(type) {
+        this.brushType = type;
+        this.updatePreview();
+    }
+
+    setBrushSize(size) {
+        this.brushSize = size;
+        this.updatePreview();
+    }
 
     setTool(tool) {
-        if (tool !== "brush" && tool !== "pan") return;
+        if (!["brush", "erase", "pan"].includes(tool)) return;
+
         this.cancelStroke();
         this.endPan();
         this.tool = tool;
+
         this.canvas.classList.toggle("pan-mode", tool === "pan");
+        this.updatePreview();
     }
 
     startStroke(event) {
-        this.currentStroke = new StrokeAction(this.brushType, this.brushSize);
+        const cellValue = this.tool === "erase" ? 0 : 1;
+
+        this.currentStroke = new StrokeAction(
+            this.brushType,
+            this.brushSize,
+            cellValue
+        );
+
         this.addStrokePoint(event);
     }
 
@@ -127,4 +163,52 @@ export class Input {
             y: Math.floor(((1 - worldPoint.y) / 2) * this.grid.height)
         };
     }
+
+    
+    updatePreview(event) {
+        if (event) {
+            this.lastPointer = {
+                clientX: event.clientX,
+                clientY: event.clientY
+            };
+        }
+
+        if (!this.lastPointer || this.tool === "pan") {
+            this.preview.hidden = true;
+            return;
+        }
+
+        const rect = this.canvas.getBoundingClientRect();
+        const { clientX, clientY } = this.lastPointer;
+
+        const insideCanvas =
+            clientX >= rect.left && clientX < rect.right &&
+            clientY >= rect.top && clientY < rect.bottom;
+
+        const cell = this.getGridPosition(this.lastPointer);
+
+        if (!insideCanvas || !this.grid.isInside(cell.x, cell.y)) {
+            this.preview.hidden = true;
+            return;
+        }
+
+        const worldX = (cell.x + 0.5) * 2 / this.grid.width - 1;
+        const worldY = 1 - (cell.y + 0.5) * 2 / this.grid.height;
+        const halfHeight = rect.height / 2;
+        const scale = rect.height * this.camera.zoom;
+
+        this.preview.style.left =
+            `${rect.width / 2 + (worldX * this.camera.zoom + this.camera.pan.x) * halfHeight}px`;
+
+        this.preview.style.top =
+            `${halfHeight - (worldY * this.camera.zoom + this.camera.pan.y) * halfHeight}px`;
+
+        this.preview.style.width = `${scale * this.brushSize / this.grid.width}px`;
+        this.preview.style.height = `${scale * this.brushSize / this.grid.height}px`;
+
+        this.preview.classList.toggle("round", this.brushType === "circle");
+        this.preview.classList.toggle("erasing", this.tool === "erase");
+        this.preview.hidden = false;
+    }
+
 }

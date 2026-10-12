@@ -161,6 +161,33 @@ button:disabled { opacity: .38; cursor: default; }
     padding: 0 8px;
 }
 
+
+/* Brush preview */
+#glCanvas:not(.pan-mode) {
+    cursor: crosshair;
+}
+.brush-preview {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+
+    border: 1.5px solid var(--accent);
+    border-radius: 2px;
+    background: rgba(76, 154, 255, 0.12);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.brush-preview.round {
+    border-radius: 50%;
+}
+
+.brush-preview.erasing {
+    border-color: #ef8989;
+    background: rgba(239, 137, 137, 0.14);
+}
+
+
 /* Buttons */
 
 .icon-button,

@@ -85,6 +85,14 @@ export class SaveFile {
             throw new Error("Invalid brush size.");
         }
 
+        
+        if (action.cellValue !== undefined &&
+            action.cellValue !== 0 &&
+            action.cellValue !== 1) {
+            throw new Error("Invalid stroke cell value.");
+        }
+
+
         if (!Array.isArray(action.points) || action.points.some(point =>
             !point ||
             !Number.isInteger(point.x) ||

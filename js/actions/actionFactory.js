@@ -16,8 +16,13 @@ export class ActionFactory {
         }
     }
 
+
     static createStrokeAction(data) {
-        const action = new StrokeAction(data.brushType, data.brushSize);
+        const action = new StrokeAction(
+            data.brushType,
+            data.brushSize,
+            data.cellValue ?? 1
+        );
 
         for (const point of data.points) {
             action.addPoint(point.x, point.y);
