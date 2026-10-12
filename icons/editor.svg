@@ -13,4 +13,38 @@
     <symbol id="zoom-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3M7 11h8"/></symbol>
     <symbol id="maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></symbol>
     <symbol id="trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M5 6l1 15h12l1-15M10 10v7M14 10v7"/></symbol>
+
+<!-- Left mouse button -->
+<symbol id="mouse-left" viewBox="0 0 24 24">
+    <rect x="5" y="2" width="14" height="20" rx="7"
+          fill="none" stroke="currentColor" stroke-width="1.7"/>
+    <path d="M12 2v9M5 11h14"
+          fill="none" stroke="currentColor" stroke-width="1.7"/>
+    <path d="M12 2a7 7 0 0 0-7 7v2h7z"
+          fill="currentColor" opacity=".45"/>
+</symbol>
+
+<!-- Middle mouse button -->
+<symbol id="mouse-middle" viewBox="0 0 24 24">
+    <rect x="5" y="2" width="14" height="20" rx="7"
+          fill="none" stroke="currentColor" stroke-width="1.7"/>
+    <path d="M12 2v9M5 11h14"
+          fill="none" stroke="currentColor" stroke-width="1.7"/>
+    <rect x="10.5" y="5" width="3" height="5" rx="1.5"
+          fill="currentColor"/>
+</symbol>
+
+<!-- Scroll wheel -->
+<symbol id="mouse-wheel" viewBox="0 0 24 24">
+    <rect x="5" y="2" width="14" height="20" rx="7"
+          fill="none" stroke="currentColor" stroke-width="1.7"/>
+    <path d="M12 2v9M5 11h14"
+          fill="none" stroke="currentColor" stroke-width="1.7"/>
+    <rect x="10.5" y="5" width="3" height="5" rx="1.5"
+          fill="currentColor"/>
+    <path d="m9 15 3-3 3 3M9 18l3 3 3-3"
+          fill="none" stroke="currentColor" stroke-width="1"/>
+</symbol>
+
+
 </svg>

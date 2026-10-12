@@ -11,97 +11,82 @@
     <div class="app-shell">
         <header class="topbar">
             <div class="brand">
-                <svg class="icon brand-icon">
-                    <use href="./icons/editor.svg#grid"></use>
-                </svg>
+                <svg class="icon brand-icon"><use href="./icons/editor.svg#grid"></use></svg>
                 <span>Marching Squares</span>
             </div>
 
-            <span class="topbar-divider" aria-hidden="true"></span>
+            <span class="topbar-divider"></span>
 
             <div class="project-title">
                 <button id="projectTitleButton" class="project-title-button" type="button" title="Rename project">
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#file"></use>
-                    </svg>
+                    <svg class="icon"><use href="./icons/editor.svg#file"></use></svg>
                     <span id="projectTitleText" class="project-title-text">Untitled Project</span>
-                    <span id="unsavedIndicator" class="unsaved-indicator" hidden aria-label="Unsaved changes"></span>
-                    <svg class="icon icon-small edit-icon">
-                        <use href="./icons/editor.svg#pencil"></use>
-                    </svg>
+                    <span id="unsavedIndicator" class="unsaved-indicator" hidden></span>
+                    <svg class="icon icon-small edit-icon"><use href="./icons/editor.svg#pencil"></use></svg>
                 </button>
-
-                <input id="projectTitleInput" type="text"
-                       aria-label="Project name"
-                       maxlength="60"
-                       spellcheck="false"
-                       hidden>
+                <input id="projectTitleInput" type="text" aria-label="Project name"
+                       maxlength="60" spellcheck="false" hidden>
             </div>
 
             <div class="topbar-actions">
-                <button id="undoButton" class="icon-button" type="button" title="Undo" aria-label="Undo" disabled>
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#undo"></use>
-                    </svg>
+                <label class="grid-selector" for="gridResolution">
+                    <svg class="icon"><use href="./icons/editor.svg#grid"></use></svg>
+                    <span>Grid</span>
+                    <select id="gridResolution" title="Grid resolution">
+                        <option value="20">20 × 20</option>
+                        <option value="40" selected>40 × 40</option>
+                        <option value="80">80 × 80</option>
+                    </select>
+                </label>
+
+                <span class="topbar-divider"></span>
+
+                <button id="undoButton" class="icon-button" type="button"
+                        title="Undo" aria-label="Undo" disabled>
+                    <svg class="icon"><use href="./icons/editor.svg#undo"></use></svg>
+                </button>
+                <button id="redoButton" class="icon-button" type="button"
+                        title="Redo" aria-label="Redo" disabled>
+                    <svg class="icon"><use href="./icons/editor.svg#redo"></use></svg>
                 </button>
 
-                <button id="redoButton" class="icon-button" type="button" title="Redo" aria-label="Redo" disabled>
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#redo"></use>
-                    </svg>
+                <span class="topbar-divider"></span>
+
+                <button id="loadButton" class="icon-button" type="button"
+                        title="Open project" aria-label="Open project">
+                    <svg class="icon"><use href="./icons/editor.svg#folder-open"></use></svg>
                 </button>
-
-                <span class="topbar-divider" aria-hidden="true"></span>
-
-                <button id="loadButton" class="icon-button" type="button" title="Open project" aria-label="Open project">
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#folder-open"></use>
-                    </svg>
-                </button>
-
                 <button id="saveButton" class="primary-button" type="button">
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#save"></use>
-                    </svg>
-                    <span>Save</span>
+                    <svg class="icon"><use href="./icons/editor.svg#save"></use></svg>
+                    Save
                 </button>
             </div>
         </header>
 
         <div class="editor-body">
             <nav class="tool-rail" aria-label="Canvas tools">
-                <button id="brushToolButton" class="tool-button is-active"
-                        type="button" title="Brush" aria-label="Brush tool" aria-pressed="true">
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#brush"></use>
-                    </svg>
+                <button id="brushToolButton" class="tool-button is-active" type="button"
+                        title="Brush" aria-label="Brush" aria-pressed="true">
+                    <svg class="icon"><use href="./icons/editor.svg#brush"></use></svg>
+                </button>
+                <button id="panToolButton" class="tool-button" type="button"
+                        title="Pan" aria-label="Pan" aria-pressed="false">
+                    <svg class="icon"><use href="./icons/editor.svg#hand"></use></svg>
                 </button>
 
-                <button id="panToolButton" class="tool-button"
-                        type="button" title="Pan" aria-label="Pan tool" aria-pressed="false">
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#hand"></use>
-                    </svg>
+                <span class="rail-divider"></span>
+
+                <button id="zoomInButton" class="tool-button" type="button"
+                        title="Zoom in" aria-label="Zoom in">
+                    <svg class="icon"><use href="./icons/editor.svg#zoom-in"></use></svg>
                 </button>
-
-                <span class="rail-divider" aria-hidden="true"></span>
-
-                <button id="zoomInButton" class="tool-button" type="button" title="Zoom in" aria-label="Zoom in">
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#zoom-in"></use>
-                    </svg>
+                <button id="zoomOutButton" class="tool-button" type="button"
+                        title="Zoom out" aria-label="Zoom out">
+                    <svg class="icon"><use href="./icons/editor.svg#zoom-out"></use></svg>
                 </button>
-
-                <button id="zoomOutButton" class="tool-button" type="button" title="Zoom out" aria-label="Zoom out">
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#zoom-out"></use>
-                    </svg>
-                </button>
-
-                <button id="fitCanvasButton" class="tool-button" type="button" title="Reset view" aria-label="Reset view">
-                    <svg class="icon">
-                        <use href="./icons/editor.svg#maximize"></use>
-                    </svg>
+                <button id="fitCanvasButton" class="tool-button" type="button"
+                        title="Reset view" aria-label="Reset view">
+                    <svg class="icon"><use href="./icons/editor.svg#maximize"></use></svg>
                 </button>
             </nav>
 
@@ -132,9 +117,7 @@
                             <label for="brushSize">Size</label>
                             <output id="brushSizeValue" for="brushSize">1</output>
                         </div>
-
-                        <input id="brushSize" type="range"
-                               min="1" max="9" step="2" value="1">
+                        <input id="brushSize" type="range" min="1" max="9" step="2" value="1">
                     </div>
                 </section>
 
@@ -145,12 +128,10 @@
                         <label for="fillColor">Fill</label>
                         <input id="fillColor" type="color" value="#262626">
                     </div>
-
                     <div class="color-field">
                         <label for="boundaryColor">Boundary</label>
                         <input id="boundaryColor" type="color" value="#CC1A1A">
                     </div>
-
                     <div class="color-field">
                         <label for="boardColor">Background</label>
                         <input id="boardColor" type="color" value="#E6E6E6">
@@ -172,7 +153,6 @@
                             <input id="marchingFillToggle" type="checkbox" checked>
                             <span class="toggle-track" aria-hidden="true"></span>
                         </label>
-
                         <label class="toggle-field">
                             <span>Boundary</span>
                             <input id="marchingBoundaryToggle" type="checkbox" checked>
@@ -181,24 +161,9 @@
                     </div>
                 </section>
 
-                <section class="panel-section">
-                    <h2>Grid</h2>
-
-                    <div class="field">
-                        <label for="gridResolution">Resolution</label>
-                        <select id="gridResolution">
-                            <option value="20">20 × 20</option>
-                            <option value="40" selected>40 × 40</option>
-                            <option value="80">80 × 80</option>
-                        </select>
-                    </div>
-                </section>
-
                 <section class="panel-section panel-actions">
                     <button id="clearButton" class="secondary-button" type="button">
-                        <svg class="icon">
-                            <use href="./icons/editor.svg#trash"></use>
-                        </svg>
+                        <svg class="icon"><use href="./icons/editor.svg#trash"></use></svg>
                         Clear Canvas
                     </button>
                 </section>
@@ -206,16 +171,25 @@
         </div>
 
         <footer class="statusbar">
-            <div class="status-help">
-                <span id="statusToolHelp"><strong>LMB</strong> Draw</span>
-                <span><strong>MMB</strong> Pan</span>
-                <span><strong>Wheel</strong> Zoom</span>
-            </div>
-
             <div class="status-info">
                 <span id="statusView">Grid</span>
                 <span id="statusGrid">40 × 40</span>
                 <span id="statusZoom">100%</span>
+            </div>
+
+            <div class="status-help">
+                <span class="shortcut">
+                    <svg class="icon"><use href="./icons/editor.svg#mouse-left"></use></svg>
+                    <span id="statusToolHelp"><strong>LMB</strong> Draw</span>
+                </span>
+                <span class="shortcut">
+                    <svg class="icon"><use href="./icons/editor.svg#mouse-middle"></use></svg>
+                    <span><strong>MMB</strong> Pan</span>
+                </span>
+                <span class="shortcut">
+                    <svg class="icon"><use href="./icons/editor.svg#mouse-wheel"></use></svg>
+                    <span><strong>Wheel</strong> Zoom</span>
+                </span>
             </div>
         </footer>
     </div>
